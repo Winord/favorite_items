@@ -1,0 +1,40 @@
+modLoader = "javafml"
+loaderVersion = "[47,)"
+license = "All Rights Reserved"
+issueTrackerURL = "https://github.com/Winord/FavoriteItems/issues"
+
+[[mods]]
+modId = "favoriteitems"
+version = "${version}"
+displayName = "Favorite Items"
+authors = "Winord"
+description = '''A client-side mod that provides Terraria-like Favorite Items System'''
+logoFile = "icon.png"
+
+[[dependencies.favoriteitems]]
+    modId = "forge"
+    mandatory = true
+    versionRange = "[47,)"
+    ordering = "NONE"
+    side = "CLIENT"
+
+[[dependencies.favoriteitems]]
+    modId = "minecraft"
+    mandatory = true
+    versionRange = "[1.20.1,1.20.2)"
+    ordering = "NONE"
+    side = "CLIENT"
+
+[[dependencies.favoriteitems]]
+    modId = "architectury"
+    mandatory = true
+    versionRange = "[9.,)"
+    ordering = "NONE"
+    side = "CLIENT"
+
+[[dependencies.favoriteitems]]
+    modId = "cloth_config"
+    mandatory = false
+    versionRange = "[11.,)"
+    ordering = "NONE"
+    side = "CLIENT"

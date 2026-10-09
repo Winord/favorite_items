@@ -1,0 +1,44 @@
+{
+    "schemaVersion": 1,
+    "id": "favoriteitems",
+    "version": "${version}",
+    "name": "Favorite Items",
+    "description": "A client-side mod that provides Terraria-like Favorite Items System",
+    "authors": [
+        "Winord"
+    ],
+    "contact": {
+        "issues": "https://github.com/Winord/FavoriteItems/issues"
+    },
+    "license": "All Rights Reserved",
+    "icon": "assets/favoriteitems/icon.png",
+    "environment": "client",
+    "entrypoints": {
+        "main":    [ "winord.favoriteitems.fabric.FavoriteItemsFabric" ],
+        "client":  [ "winord.favoriteitems.fabric.FavoriteItemsFabricClient" ],
+        "modmenu": [ "winord.favoriteitems.fabric.ModMenuIntegration" ]
+    },
+    "mixins": [
+        "favoriteitems.mixins.json",
+        "favoriteitems.mixins.inventorysorter.json",
+        "favoriteitems.mixins.clientsort.json",
+        "favoriteitems.mixins.nemosinventorysorting.json",
+        "favoriteitems.mixins.ipn.json",
+        "favoriteitems.mixins.litematica.json"
+    ],
+    "depends": {
+        "fabricloader": "*",
+        "fabric-api": "*",
+        "architectury": "*",
+        "minecraft": "~1.20.1"
+    },
+    "suggests": {
+        "cloth-config": "*",
+        "modmenu": "*",
+        "inventory-sorting": "*",
+        "clientsort": "*",
+        "nemos-inventory-sorting": "*",
+        "inventoryprofilesnext": "*",
+        "litematica": "*"
+    }
+}

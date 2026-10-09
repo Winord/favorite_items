@@ -1,0 +1,14 @@
+{
+    "magic": {
+        "subtitle": "sound.favoriteitems.magic",
+        "sounds": [
+            "favoriteitems:magic"
+        ]
+    },
+    "custom": {
+        "subtitle": "sound.favoriteitems.custom",
+        "sounds": [
+            "favoriteitems:custom"
+        ]
+    }
+}

@@ -1,0 +1,8 @@
+{
+    "custom": {
+        "subtitle": "sound.favoriteitems.custom",
+        "sounds": [
+            "favoriteitems:custom"
+        ]
+    }
+}
