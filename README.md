@@ -49,7 +49,7 @@ By default favorites also stay put when the *Move Same Items* buttons and keys (
 Inventory Profiles Next) run. The Extra tab can change that so that stackable favorites move too, one item staying in
 the favorite slot.
 
-Download the latest version over at [Modrinth](https://modrinth.com/mod/favoriteitems)!
+Download the latest version over at [Modrinth](https://modrinth.com/mod/favorite_items)!
 
 ## Customizing further
 The icon (`Custom` style) and toggle sound (`Custom` option) both ship with placeholder assets whose only
