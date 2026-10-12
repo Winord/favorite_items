@@ -25,7 +25,6 @@ dependencies {
 
     modCompileOnly "maven.modrinth:inventory-sorting:${rootProject.inv_sorter_version}"
     modLocalRuntime "maven.modrinth:inventory-sorting:${rootProject.inv_sorter_version}"
-    modLocalRuntime("net.kyrptonaught:kyrptconfig:${rootProject.kyrptconfig_version}") { exclude group: "net.fabricmc.fabric-api" }
 
     modCompileOnly "com.terraformersmc:modmenu:${rootProject.modmenu_version}"
     modLocalRuntime "com.terraformersmc:modmenu:${rootProject.modmenu_version}"

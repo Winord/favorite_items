@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import winord.favoriteitems.compat.ipn.IpnCompat;
 
 @Pseudo
-@Mixin(targets = "org.anti_ad.mc.ipnext.event.AutoRefillHandler$ItemSlotMonitor$Companion", remap = false)
+@Mixin(targets = "org.anti_ad.mc.ipnext.event.autorefill.AutoRefillHandler$ItemSlotMonitor$Companion", remap = false)
 public abstract class MixinAutoRefillSearch {
     @Inject(method = "findCorrespondingSlot", at = @At("HEAD"), remap = false, require = 0)
     private void favoriteitems$enterRefillSearch(CallbackInfoReturnable<Integer> cir) {

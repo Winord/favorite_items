@@ -18,7 +18,7 @@ public final class StylePreviewRenderer {
     private static final float UNDER_ICON_Z = 50f;
     private static final float OVER_ICON_Z = 200f;
     private static final ResourceLocation SLOT_BACKGROUND =
-            new ResourceLocation(MOD_ID, "textures/gui/slot_background.png");
+            ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/gui/slot_background.png");
 
     public record Data(FavoriteStyle style, Supplier<StyleSettings> settings) { }
 

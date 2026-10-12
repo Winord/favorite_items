@@ -396,10 +396,10 @@ public final class FavoriteSlots {
             if (i >= ARMOR_START_INDEX && i != OFFHAND_INDEX) continue;
 
             var now = inventory.getItem(i);
-            if (now.isEmpty() || !ItemStack.isSameItemSameTags(now, returned)) continue;
+            if (now.isEmpty() || !ItemStack.isSameItemSameComponents(now, returned)) continue;
 
             var before = pendingReturn.before()[i];
-            int gain = now.getCount() - (ItemStack.isSameItemSameTags(before, returned) ? before.getCount() : 0);
+            int gain = now.getCount() - (ItemStack.isSameItemSameComponents(before, returned) ? before.getCount() : 0);
             if (gain <= 0) continue;
 
             total += gain;

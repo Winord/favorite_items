@@ -8,6 +8,8 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Shearable;
+import net.minecraft.world.entity.animal.Wolf;
+import net.minecraft.world.entity.animal.armadillo.Armadillo;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.BrushItem;
@@ -42,8 +44,8 @@ public final class ToolGuard {
     public static final String SHEARS = "config." + MOD_ID + ".shears_protect";
     public static final String BRUSH = "config." + MOD_ID + ".brush_protect";
 
-    private static final TagKey<Item> SHEARS_TAG_FABRIC = TagKey.create(Registries.ITEM, new ResourceLocation("c", "shears"));
-    private static final TagKey<Item> SHEARS_TAG_FORGE = TagKey.create(Registries.ITEM, new ResourceLocation("forge", "shears"));
+    private static final TagKey<Item> SHEARS_TAG_FABRIC = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "shears"));
+    private static final TagKey<Item> SHEARS_TAG_TOOLS = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "tools/shear"));
 
     private ToolGuard() { }
 
@@ -80,12 +82,22 @@ public final class ToolGuard {
     }
 
     public static String blockingToggleForEntityUse(Player player, InteractionHand hand, Entity target) {
-        if (!FavoriteItemsConfig.shearsProtect || FavoriteSlots.isSuspended()) return null;
+        if (FavoriteSlots.isSuspended()) return null;
 
         ItemStack stack = player.getItemInHand(hand);
-        if (stack.isEmpty() || !isShears(stack)) return null;
+        if (stack.isEmpty()) return null;
 
-        return target instanceof Shearable shearable && shearable.readyForShearing() ? SHEARS : null;
+        if (FavoriteItemsConfig.shearsProtect && isShears(stack)) {
+            if (target instanceof Shearable shearable && shearable.readyForShearing()) return SHEARS;
+            if (target instanceof Wolf wolf && wolf.isOwnedBy(player) && !wolf.getBodyArmorItem().isEmpty()) return SHEARS;
+            return null;
+        }
+
+        if (FavoriteItemsConfig.brushProtect && stack.getItem() instanceof BrushItem
+                && target instanceof Armadillo armadillo && !armadillo.isBaby()) {
+            return BRUSH;
+        }
+        return null;
     }
 
     public static void clientTick(Minecraft client) {
@@ -105,7 +117,7 @@ public final class ToolGuard {
 
     private static boolean isShears(ItemStack stack) {
         return stack.getItem() instanceof ShearsItem || stack.is(Items.SHEARS)
-                || stack.is(SHEARS_TAG_FABRIC) || stack.is(SHEARS_TAG_FORGE);
+                || stack.is(SHEARS_TAG_FABRIC) || stack.is(SHEARS_TAG_TOOLS);
     }
 
     private static boolean axeActsOn(BlockState state, Block block) {

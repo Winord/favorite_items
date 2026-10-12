@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[47,)"
+loaderVersion = "[1,)"
 license = "All Rights Reserved"
 issueTrackerURL = "https://github.com/Winord/FavoriteItems/issues"
 
@@ -11,30 +11,45 @@ authors = "Winord"
 description = '''A client-side mod that provides Terraria-like Favorite Items System'''
 logoFile = "icon.png"
 
+[[mixins]]
+config = "favoriteitems.mixins.json"
+
+[[mixins]]
+config = "favoriteitems.mixins.clientsort.json"
+
+[[mixins]]
+config = "favoriteitems.mixins.nemosinventorysorting.json"
+
+[[mixins]]
+config = "favoriteitems.mixins.ipn.json"
+
+[[mixins]]
+config = "favoriteitems.mixins.litematica.json"
+
 [[dependencies.favoriteitems]]
-    modId = "forge"
-    mandatory = true
-    versionRange = "[47,)"
+    modId = "neoforge"
+    type = "required"
+    versionRange = "[21.1,)"
     ordering = "NONE"
     side = "CLIENT"
 
 [[dependencies.favoriteitems]]
     modId = "minecraft"
-    mandatory = true
-    versionRange = "[1.20.1,1.20.2)"
+    type = "required"
+    versionRange = "[1.21.1,1.21.2)"
     ordering = "NONE"
     side = "CLIENT"
 
 [[dependencies.favoriteitems]]
     modId = "architectury"
-    mandatory = true
-    versionRange = "[9.,)"
+    type = "required"
+    versionRange = "[13,)"
     ordering = "NONE"
     side = "CLIENT"
 
 [[dependencies.favoriteitems]]
     modId = "cloth_config"
-    mandatory = false
-    versionRange = "[11.,)"
+    type = "optional"
+    versionRange = "[15,)"
     ordering = "NONE"
     side = "CLIENT"

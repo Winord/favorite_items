@@ -21,8 +21,8 @@ public final class RenderUtil {
 
     static {
         for (var style : FavoriteStyle.values()) {
-            MASKS.put(style, new ResourceLocation(MOD_ID, "textures/gui/" + style.id() + "_mask.png"));
-            OVERLAYS.put(style, new ResourceLocation(MOD_ID, "textures/gui/" + style.id() + "_overlay.png"));
+            MASKS.put(style, ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/gui/" + style.id() + "_mask.png"));
+            OVERLAYS.put(style, ResourceLocation.fromNamespaceAndPath(MOD_ID, "textures/gui/" + style.id() + "_overlay.png"));
         }
     }
 

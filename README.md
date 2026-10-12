@@ -39,7 +39,7 @@ remembers its item, so on servers with a lobby the favorites stay dormant there 
 Favorited slots are left alone by these sorting mods (each integration only activates when the mod is installed):
 - [Inventory Sorting](https://modrinth.com/mod/inventory-sorting)
 - [ClientSort](https://modrinth.com/mod/clientsort)
-- Nemo's Inventory Sorting: sort, move-all, move-same and drop-all buttons, on the 1.20.1 builds as well as the newer
+- Nemo's Inventory Sorting: sort, move-all, move-same and drop-all buttons, on the 1.8.x builds as well as the newer
   builds that have their own slot locking.
 - Inventory Profiles Next: sorting, move-all, scrolling and slot locks leave favorites alone, and auto refill can skip
   them or top up a favorited stack whose last item is protected.

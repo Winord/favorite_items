@@ -41,7 +41,7 @@ public final class SlotClicks {
             if (menu.getCarried().isEmpty()) break;
             ItemStack held = slot.getItem();
             if (!held.isEmpty() && held.getCount() < slot.getMaxStackSize(held)
-                    && ItemStack.isSameItemSameTags(held, menu.getCarried()) && slot.mayPlace(menu.getCarried())) {
+                    && ItemStack.isSameItemSameComponents(held, menu.getCarried()) && slot.mayPlace(menu.getCarried())) {
                 click(menu, slot.index, 0);
             }
         }

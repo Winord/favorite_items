@@ -42,9 +42,9 @@ subprojects {
 
     repositories {
         maven { url = "https://api.modrinth.com/maven" }
-        maven { url = "https://maven.kyrptonaught.dev" }
         maven { url = "https://maven.terraformersmc.com/releases" }
         maven { url = "https://maven.shedaniel.me" }
         maven { url = "https://maven.architectury.dev/" }
+        maven { url = "https://maven.neoforged.net/releases/" }
     }
 }

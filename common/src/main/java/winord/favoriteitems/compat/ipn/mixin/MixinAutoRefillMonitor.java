@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import winord.favoriteitems.compat.ipn.IpnCompat;
 
 @Pseudo
-@Mixin(targets = "org.anti_ad.mc.ipnext.event.AutoRefillHandler$ItemSlotMonitor", remap = false)
+@Mixin(targets = "org.anti_ad.mc.ipnext.event.autorefill.AutoRefillHandler$ItemSlotMonitor", remap = false)
 public abstract class MixinAutoRefillMonitor {
     @Inject(method = "shouldHandleItem", at = @At("RETURN"), cancellable = true, remap = false, require = 0)
     private void favoriteitems$refillProtectedLastItem(CallbackInfoReturnable<Boolean> cir) {

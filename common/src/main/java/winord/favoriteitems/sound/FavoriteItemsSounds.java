@@ -19,7 +19,7 @@ public final class FavoriteItemsSounds {
     private FavoriteItemsSounds() { }
 
     private static RegistrySupplier<SoundEvent> register(String name) {
-        return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(MOD_ID, name)));
+        return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, name)));
     }
 
     public static void register() {

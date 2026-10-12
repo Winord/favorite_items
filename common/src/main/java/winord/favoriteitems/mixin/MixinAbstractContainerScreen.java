@@ -6,7 +6,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
@@ -115,7 +114,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
             if (candidate == null) continue;
 
             var stack = candidate.getItem();
-            if (!stack.isEmpty() && stack.getCount() < stack.getMaxStackSize() && ItemStack.isSameItemSameTags(stack, moving)) {
+            if (!stack.isEmpty() && stack.getCount() < stack.getMaxStackSize() && ItemStack.isSameItemSameComponents(stack, moving)) {
                 return candidate;
             }
         }
@@ -143,8 +142,8 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
     private boolean favoriteitems$wouldEquipArmor(Slot slot) {
         if (!(menu instanceof InventoryMenu) || slot.index < 9 || slot.index > 44) return false;
 
-        var equipmentSlot = Mob.getEquipmentSlotForItem(slot.getItem());
-        return equipmentSlot.getType() == EquipmentSlot.Type.ARMOR && !menu.getSlot(8 - equipmentSlot.getIndex()).hasItem();
+        var equipmentSlot = minecraft.player.getEquipmentSlotForItem(slot.getItem());
+        return equipmentSlot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR && !menu.getSlot(8 - equipmentSlot.getIndex()).hasItem();
     }
 
     @Unique
@@ -152,7 +151,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
         if (minecraft.hasSingleplayerServer() || carried.isEmpty() || carried.getCount() >= carried.getMaxStackSize()) return false;
 
         for (var candidate : menu.slots) {
-            if (candidate.hasItem() && ItemStack.isSameItemSameTags(candidate.getItem(), carried)
+            if (candidate.hasItem() && ItemStack.isSameItemSameComponents(candidate.getItem(), carried)
                     && FavoriteSlots.isFavorite(menu, candidate.index)) {
                 return true;
             }
@@ -376,7 +375,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
 
             var after = entry.getValue();
             if (after > countsBefore.getOrDefault(index, 0) && after > bestCount
-                    && ItemStack.isSameItemSameTags(favoriteitems$stackOf(index), movedStack)) {
+                    && ItemStack.isSameItemSameComponents(favoriteitems$stackOf(index), movedStack)) {
                 bestCount = after;
                 bestIndex = index;
             }
@@ -428,7 +427,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
 
         var slotStack = slot.getItem();
         var depositCount = button != 0 ? 1 : cursorStack.getCount();
-        var sameItem = ItemStack.isSameItemSameTags(cursorStack, slotStack);
+        var sameItem = ItemStack.isSameItemSameComponents(cursorStack, slotStack);
         var canFullyMerge = sameItem
                 && slotStack.getMaxStackSize() >= slotStack.getCount() + depositCount
                 && cursorStack.getCount() == depositCount;
@@ -583,7 +582,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
         var depositCount = AbstractContainerMenu.getQuickcraftType(button) == 1 ? 1 : cursorStack.getCount();
 
         if (targetStack.isEmpty()) return depositCount == cursorStack.getCount();
-        if (!ItemStack.isSameItemSameTags(cursorStack, targetStack)) return true;
+        if (!ItemStack.isSameItemSameComponents(cursorStack, targetStack)) return true;
 
         return targetStack.getMaxStackSize() >= targetStack.getCount() + depositCount
                 && cursorStack.getCount() == depositCount;

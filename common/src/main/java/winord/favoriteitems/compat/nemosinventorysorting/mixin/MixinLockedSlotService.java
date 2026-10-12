@@ -13,9 +13,10 @@ import winord.favoriteitems.util.FavoriteSlots;
 @Mixin(targets = "com.nemonotfound.nemos.inventory.sorting.service.LockedSlotService")
 public class MixinLockedSlotService {
     @Inject(method = "isLocked", at = @At("HEAD"), cancellable = true, require = 0, remap = false)
-    private void favoriteitems$countFavoritesAsLocked(int index, int startIndex, CallbackInfoReturnable<Boolean> cir) {
-        if (!(Minecraft.getInstance().screen instanceof AbstractContainerScreen<?> screen)) return;
+    private void favoriteitems$favoritesReplaceLockedSlots(int index, int startIndex, CallbackInfoReturnable<Boolean> cir) {
+        boolean favorite = Minecraft.getInstance().screen instanceof AbstractContainerScreen<?> screen
+                && FavoriteSlots.isFavorite(screen.getMenu(), index);
 
-        if (FavoriteSlots.isFavorite(screen.getMenu(), index)) cir.setReturnValue(true);
+        cir.setReturnValue(favorite);
     }
 }

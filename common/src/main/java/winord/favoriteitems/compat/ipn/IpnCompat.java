@@ -33,10 +33,10 @@ public final class IpnCompat {
     private static final String MOD_SETTINGS = "org.anti_ad.mc.ipnext.config.ModSettings";
     private static final String ADVANCED_CONTAINER = "org.anti_ad.mc.ipnext.inventory.AdvancedContainer";
     private static final String GENERAL_ACTIONS = "org.anti_ad.mc.ipnext.inventory.GeneralInventoryActions";
-    private static final String REFILL_MONITOR = "org.anti_ad.mc.ipnext.event.AutoRefillHandler$ItemSlotMonitor$Companion";
+    private static final String REFILL_MONITOR = "org.anti_ad.mc.ipnext.event.autorefill.AutoRefillHandler$ItemSlotMonitor$Companion";
     private static final String ITEM_AREA = "org.anti_ad.mc.ipnext.inventory.ItemArea";
-    private static final String SLOT_MONITOR = "org.anti_ad.mc.ipnext.event.AutoRefillHandler$ItemSlotMonitor";
-    private static final String REFILL_HANDLER = "org.anti_ad.mc.ipnext.event.AutoRefillHandler";
+    private static final String SLOT_MONITOR = "org.anti_ad.mc.ipnext.event.autorefill.AutoRefillHandler$ItemSlotMonitor";
+    private static final String REFILL_HANDLER = "org.anti_ad.mc.ipnext.event.autorefill.AutoRefillHandler";
     private static final String CONTAINER_CLICKER = "org.anti_ad.mc.ipnext.inventory.ContainerClicker";
     private static final String IPN_ITEM_STACK = "org.anti_ad.mc.ipnext.item.ItemStack";
     private static final String IPN_ITEM_TYPE = "org.anti_ad.mc.ipnext.item.ItemType";
@@ -183,7 +183,7 @@ public final class IpnCompat {
 
         ItemStack source = menu.getSlot(sourceMenuSlot).getItem();
         ItemStack target = menu.getSlot(topUpMenuSlot).getItem();
-        if (source.isEmpty() || FavoriteSlots.isFavorite(menu, sourceMenuSlot) || !ItemStack.isSameItemSameTags(source, target)) {
+        if (source.isEmpty() || FavoriteSlots.isFavorite(menu, sourceMenuSlot) || !ItemStack.isSameItemSameComponents(source, target)) {
             return true;
         }
 

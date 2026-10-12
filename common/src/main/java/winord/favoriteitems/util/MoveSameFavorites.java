@@ -61,7 +61,7 @@ public final class MoveSameFavorites {
 
             ItemStack stack = slot.getItem();
             if (stack.getCount() <= 1 || stack.getMaxStackSize() <= 1 || !FavoriteSlots.isFavorite(menu, slot.index)) continue;
-            if (!focused.isEmpty() && !ItemStack.isSameItemSameTags(focused, stack)) continue;
+            if (!focused.isEmpty() && !ItemStack.isSameItemSameComponents(focused, stack)) continue;
             if (move.needsMatch && !hasRoomFor(storage, stack, move.intoEmptySlots)) continue;
 
             SlotClicks.moveAllButOne(menu, slot.index, storage, move.intoEmptySlots);
@@ -84,11 +84,11 @@ public final class MoveSameFavorites {
 
             ItemStack stack = slot.getItem();
             if (stack.getMaxStackSize() <= 1 || !FavoriteSlots.isFavorite(menu, slot.index)) continue;
-            if (!focused.isEmpty() && !ItemStack.isSameItemSameTags(focused, stack)) continue;
+            if (!focused.isEmpty() && !ItemStack.isSameItemSameComponents(focused, stack)) continue;
 
             for (var source : sources) {
                 if (slot.getItem().getCount() >= slot.getMaxStackSize(slot.getItem())) break;
-                if (ItemStack.isSameItemSameTags(source.getItem(), slot.getItem())) {
+                if (ItemStack.isSameItemSameComponents(source.getItem(), slot.getItem())) {
                     SlotClicks.mergeInto(menu, source.index, slot.index);
                 }
             }
@@ -99,7 +99,7 @@ public final class MoveSameFavorites {
         boolean holdsItem = false;
         for (var target : storage) {
             ItemStack held = target.getItem();
-            if (held.isEmpty() || !ItemStack.isSameItemSameTags(held, stack)) continue;
+            if (held.isEmpty() || !ItemStack.isSameItemSameComponents(held, stack)) continue;
 
             holdsItem = true;
             if (held.getCount() < target.getMaxStackSize(held)) return true;

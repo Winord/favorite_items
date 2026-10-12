@@ -1,6 +1,7 @@
 package winord.favoriteitems.util;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
@@ -103,7 +104,7 @@ public final class ProtectGuard {
         var items = player.getInventory().items;
         for (int i = 0; i < items.size(); i++) {
             var candidate = items.get(i);
-            if (candidate.isEmpty() || !ItemStack.isSameItemSameTags(like, candidate)) continue;
+            if (candidate.isEmpty() || !ItemStack.isSameItemSameComponents(like, candidate)) continue;
             if (!hidesFromBuilding(player, i, candidate)) return i;
         }
         return -1;
@@ -129,7 +130,7 @@ public final class ProtectGuard {
         var inventory = player.getInventory();
         int selected = inventory.selected;
         var held = inventory.getItem(selected);
-        if (!ItemStack.isSameItemSameTags(held, wanted) || !hidesFromBuilding(player, selected, held)) return false;
+        if (!ItemStack.isSameItemSameComponents(held, wanted) || !hidesFromBuilding(player, selected, held)) return false;
 
         int source = findBuildableStack(player, wanted);
         if (source < FavoriteSlots.HOTBAR_SIZE) return false;
@@ -199,7 +200,7 @@ public final class ProtectGuard {
         if (!ProtectPresets.active().rule(ProtectAction.SHOOT_ARROW).matchesItem(ammo)) return false;
 
         if (weapon.getItem() instanceof BowItem && ammo.is(Items.ARROW)
-                && EnchantmentHelper.getItemEnchantmentLevel(Enchantments.INFINITY_ARROWS, weapon) > 0) return false;
+                && EnchantmentHelper.getItemEnchantmentLevel(player.level().registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.INFINITY), weapon) > 0) return false;
 
         int slot = slotOf(player.getInventory(), ammo);
         if (slot < 0 || !isTargeted(slot)) return false;
