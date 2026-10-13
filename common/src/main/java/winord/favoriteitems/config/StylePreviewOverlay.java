@@ -22,6 +22,7 @@ public final class StylePreviewOverlay {
         Object sectionAt(int mouseY);
         void closeDropdownsOutside(double mouseX, double mouseY);
         int labelLimit(Object entry);
+        void paintFrame(GuiGraphics graphics, Object widget);
     }
 
     private record Section(FavoriteStyle style, Object entry, BooleanSupplier expanded) { }
@@ -166,6 +167,14 @@ public final class StylePreviewOverlay {
         }
         if (current == null) current = activeStyle.get();
         return current;
+    }
+
+    public static void paintListFrame(Object widget, GuiGraphics graphics) {
+        var ours = screen.get();
+        if (ours == null || Minecraft.getInstance().screen != ours || !panelActive) return;
+
+        var list = listAccess.get();
+        if (list != null) list.paintFrame(graphics, widget);
     }
 
     public static Component fitLabel(Object entry, Component label) {

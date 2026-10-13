@@ -15,13 +15,18 @@ import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
 import me.shedaniel.clothconfig2.gui.entries.StringListListEntry;
 import me.shedaniel.clothconfig2.gui.entries.SubCategoryListEntry;
 import me.shedaniel.clothconfig2.gui.entries.TextFieldListEntry;
+import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
+import winord.favoriteitems.FavoriteItems;
 import winord.favoriteitems.compat.ipn.IpnCompat;
 import winord.favoriteitems.util.MoveSameFavorites;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
@@ -122,6 +127,25 @@ public final class ClothConfigScreenBuilder {
         return screen;
     }
 
+    private static Method holeMethod;
+    private static boolean holeFailed;
+
+    private static void paintHole(GuiGraphics graphics, DynamicEntryListWidget<?> list, int from, int to) {
+        if (holeFailed) return;
+
+        try {
+            if (holeMethod == null) {
+                holeMethod = DynamicEntryListWidget.class.getDeclaredMethod("renderHoleBackground",
+                        GuiGraphics.class, int.class, int.class, int.class, int.class);
+                holeMethod.setAccessible(true);
+            }
+            holeMethod.invoke(list, graphics, from, to, 255, 255);
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            holeFailed = true;
+            FavoriteItems.LOGGER.warn("Cloth Config list background could not be extended under the style preview.", e);
+        }
+    }
+
     private static StylePreviewOverlay.ListAccess listAccessOf(Screen screen) {
         if (!(screen instanceof ClothConfigScreen cloth) || cloth.listWidget == null) return null;
 
@@ -129,6 +153,27 @@ public final class ClothConfigScreenBuilder {
         return new StylePreviewOverlay.ListAccess() {
             @Override public int top() { return list.top; }
             @Override public int bottom() { return list.bottom; }
+            @Override public void paintFrame(GuiGraphics graphics, Object widget) {
+                if (widget != list) return;
+
+                int from = list.left + list.width;
+                int to = screen.width;
+                if (from >= to) return;
+
+                int savedLeft = list.left;
+                int savedWidth = list.width;
+                list.left = from;
+                list.width = to - from;
+                try {
+                    paintHole(graphics, list, 0, list.top);
+                    paintHole(graphics, list, list.bottom, list.height);
+                } finally {
+                    list.left = savedLeft;
+                    list.width = savedWidth;
+                }
+                graphics.blit(RenderType::guiTextured, Screen.HEADER_SEPARATOR, from, list.top - 2, 0f, 0f, to - from, 2, 32, 2);
+                graphics.blit(RenderType::guiTextured, Screen.FOOTER_SEPARATOR, from, list.bottom, 0f, 0f, to - from, 2, 32, 2);
+            }
             @Override public void setBounds(int left, int width) {
                 list.left = left;
                 list.width = width;
