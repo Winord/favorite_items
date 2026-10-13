@@ -11,7 +11,10 @@ import winord.favoriteitems.compat.clientsort.ClientSortCompat;
 import winord.favoriteitems.util.FavoriteSlots;
 
 @Pseudo
-@Mixin(targets = "dev.terminalmc.clientsort.client.compat.lockedinslots.LockedInSlotsCompat")
+@Mixin(targets = {
+        "dev.terminalmc.clientsort.client.compat.lockedinslots.LockedInSlotsCompat",
+        "dev.terminalmc.clientsort.client.compat.itemlocks.ItemLocksCompat"
+})
 public class MixinLockedInSlotsCompat {
     @Inject(method = "isLocked", at = @At("HEAD"), cancellable = true, require = 0, remap = false)
     private static void favoriteitems$countFavoritesAsLocked(Slot slot, CallbackInfoReturnable<Boolean> cir) {

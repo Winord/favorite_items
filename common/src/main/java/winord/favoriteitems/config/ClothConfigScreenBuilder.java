@@ -4,7 +4,6 @@ import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.api.Requirement;
-import me.shedaniel.clothconfig2.api.ScissorsHandler;
 import me.shedaniel.clothconfig2.gui.ClothConfigScreen;
 import me.shedaniel.clothconfig2.gui.entries.BooleanListEntry;
 import me.shedaniel.clothconfig2.gui.entries.DropdownBoxEntry;
@@ -16,7 +15,6 @@ import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
 import me.shedaniel.clothconfig2.gui.entries.StringListListEntry;
 import me.shedaniel.clothconfig2.gui.entries.SubCategoryListEntry;
 import me.shedaniel.clothconfig2.gui.entries.TextFieldListEntry;
-import me.shedaniel.math.Rectangle;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
@@ -131,25 +129,6 @@ public final class ClothConfigScreenBuilder {
         return new StylePreviewOverlay.ListAccess() {
             @Override public int top() { return list.top; }
             @Override public int bottom() { return list.bottom; }
-            @Override public void pushClip(int x, int y, int width, int height) {
-                ScissorsHandler.INSTANCE.scissor(new Rectangle(x, y, width, height));
-            }
-            @Override public void popClip() {
-                ScissorsHandler.INSTANCE.removeLastScissor();
-            }
-            @Override public int[] clipBounds() {
-                var areas = ScissorsHandler.INSTANCE.getScissorsAreas();
-                if (areas.isEmpty()) return null;
-
-                int left = Integer.MIN_VALUE, top = Integer.MIN_VALUE, right = Integer.MAX_VALUE, bottom = Integer.MAX_VALUE;
-                for (var area : areas) {
-                    left = Math.max(left, area.getMinX());
-                    top = Math.max(top, area.getMinY());
-                    right = Math.min(right, area.getMaxX());
-                    bottom = Math.min(bottom, area.getMaxY());
-                }
-                return new int[] { left, top, right, bottom };
-            }
             @Override public void setBounds(int left, int width) {
                 list.left = left;
                 list.width = width;

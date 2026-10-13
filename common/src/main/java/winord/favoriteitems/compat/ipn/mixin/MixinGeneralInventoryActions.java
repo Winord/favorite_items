@@ -10,7 +10,7 @@ import winord.favoriteitems.compat.ipn.IpnCompat;
 @Pseudo
 @Mixin(targets = "org.anti_ad.mc.ipnext.inventory.GeneralInventoryActions", remap = false)
 public abstract class MixinGeneralInventoryActions {
-    @Inject(method = {"scrollUp", "scrollDown"}, at = @At("HEAD"), cancellable = true, remap = false, require = 0)
+    @Inject(method = {"scrollUp", "scrollDown", "scrollToPlayer", "scrollToChest"}, at = @At("HEAD"), cancellable = true, remap = false, require = 0)
     private void favoriteitems$skipFavoriteWheelMove(CallbackInfo ci) {
         if (IpnCompat.blocksWheelMove()) ci.cancel();
     }

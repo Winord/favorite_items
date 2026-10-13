@@ -1,7 +1,7 @@
 package winord.favoriteitems.util;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import winord.favoriteitems.config.FavoriteItemsConfig;
 import winord.favoriteitems.config.FavoriteStyle;
@@ -15,6 +15,7 @@ import static winord.favoriteitems.FavoriteItems.MOD_ID;
 public final class RenderUtil {
     private static final int ICON_SIZE = 18;
     private static final int ICON_INSET = 1;
+    private static final float ABOVE_ITEM_Z = 300f;
 
     private static final Map<FavoriteStyle, ResourceLocation> MASKS = new EnumMap<>(FavoriteStyle.class);
     private static final Map<FavoriteStyle, ResourceLocation> OVERLAYS = new EnumMap<>(FavoriteStyle.class);
@@ -45,42 +46,34 @@ public final class RenderUtil {
         var overlay = OVERLAYS.get(style);
         int px = x - ICON_INSET, py = y - ICON_INSET;
 
-        int tint = settings.dyeableColor;
-        float r = ((tint >> 16) & 0xFF) / 255f;
-        float g = ((tint >> 8) & 0xFF) / 255f;
-        float b = (tint & 0xFF) / 255f;
+        int tint = settings.dyeableColor & 0xFFFFFF;
+        float zShift = above && !depthTested ? ABOVE_ITEM_Z : 0f;
 
-        if (!depthTested) RenderSystem.disableDepthTest();
-        RenderSystem.depthMask(false);
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
+        var pose = graphics.pose();
+        pose.pushPose();
+        if (zShift != 0f) pose.translate(0f, 0f, zShift);
 
         if (settings.shadowEnabled) {
-            var pose = graphics.pose();
             pose.pushPose();
             pose.translate(0.5f, 0.5f, 0f);
-            if (dyeable) blitLayer(graphics, mask, px, py, 0f, 0f, 0f, dyeableAlpha * 0.25f);
-            if (fixed) blitLayer(graphics, overlay, px, py, 0f, 0f, 0f, staticAlpha * 0.25f);
+            if (dyeable) blitLayer(graphics, mask, px, py, 0, dyeableAlpha * 0.25f);
+            if (fixed) blitLayer(graphics, overlay, px, py, 0, staticAlpha * 0.25f);
             pose.popPose();
         }
 
         if (dyeable && fixed && !settings.staticAboveDyeable) {
-            blitLayer(graphics, overlay, px, py, 1f, 1f, 1f, staticAlpha);
-            blitLayer(graphics, mask, px, py, r, g, b, dyeableAlpha);
+            blitLayer(graphics, overlay, px, py, 0xFFFFFF, staticAlpha);
+            blitLayer(graphics, mask, px, py, tint, dyeableAlpha);
         } else {
-            if (dyeable) blitLayer(graphics, mask, px, py, r, g, b, dyeableAlpha);
-            if (fixed) blitLayer(graphics, overlay, px, py, 1f, 1f, 1f, staticAlpha);
+            if (dyeable) blitLayer(graphics, mask, px, py, tint, dyeableAlpha);
+            if (fixed) blitLayer(graphics, overlay, px, py, 0xFFFFFF, staticAlpha);
         }
 
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        RenderSystem.depthMask(true);
-        RenderSystem.enableDepthTest();
-        RenderSystem.disableBlend();
+        pose.popPose();
     }
 
-    private static void blitLayer(GuiGraphics graphics, ResourceLocation texture, int px, int py,
-                                  float r, float g, float b, float alpha) {
-        RenderSystem.setShaderColor(r, g, b, alpha);
-        graphics.blit(texture, px, py, 0, 0, ICON_SIZE, ICON_SIZE, ICON_SIZE, ICON_SIZE);
+    private static void blitLayer(GuiGraphics graphics, ResourceLocation texture, int px, int py, int rgb, float alpha) {
+        int a = Math.max(0, Math.min(255, Math.round(alpha * 255f)));
+        graphics.blit(RenderType::guiTextured, texture, px, py, 0f, 0f, ICON_SIZE, ICON_SIZE, ICON_SIZE, ICON_SIZE, (a << 24) | rgb);
     }
 }

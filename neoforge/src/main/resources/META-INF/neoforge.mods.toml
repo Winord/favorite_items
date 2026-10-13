@@ -29,27 +29,27 @@ config = "favoriteitems.mixins.litematica.json"
 [[dependencies.favoriteitems]]
     modId = "neoforge"
     type = "required"
-    versionRange = "[21.1,)"
+    versionRange = "[21.2,)"
     ordering = "NONE"
     side = "CLIENT"
 
 [[dependencies.favoriteitems]]
     modId = "minecraft"
     type = "required"
-    versionRange = "[1.21.1,1.21.2)"
+    versionRange = "[1.21.2,1.21.4)"
     ordering = "NONE"
     side = "CLIENT"
 
 [[dependencies.favoriteitems]]
     modId = "architectury"
     type = "required"
-    versionRange = "[13,)"
+    versionRange = "[14,)"
     ordering = "NONE"
     side = "CLIENT"
 
 [[dependencies.favoriteitems]]
     modId = "cloth_config"
     type = "optional"
-    versionRange = "[15,)"
+    versionRange = "[16,)"
     ordering = "NONE"
     side = "CLIENT"

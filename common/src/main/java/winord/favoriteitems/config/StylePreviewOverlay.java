@@ -19,12 +19,9 @@ public final class StylePreviewOverlay {
         int top();
         int bottom();
         void setBounds(int left, int width);
-        void pushClip(int x, int y, int width, int height);
-        void popClip();
         Object sectionAt(int mouseY);
         void closeDropdownsOutside(double mouseX, double mouseY);
         int labelLimit(Object entry);
-        int[] clipBounds();
     }
 
     private record Section(FavoriteStyle style, Object entry, BooleanSupplier expanded) { }
@@ -171,25 +168,6 @@ public final class StylePreviewOverlay {
         return current;
     }
 
-    public static int clipScissor(int index, int x1, int y1, int x2, int y2) {
-        int[] bounds = new int[] { x1, y1, x2, y2 };
-
-        var ours = screen.get();
-        if (ours == null || Minecraft.getInstance().screen != ours) return bounds[index];
-
-        var list = listAccess.get();
-        var clip = list == null ? null : list.clipBounds();
-        if (clip == null) return bounds[index];
-
-        int left = Math.max(x1, clip[0]);
-        int top = Math.max(y1, clip[1]);
-        bounds[0] = left;
-        bounds[1] = top;
-        bounds[2] = Math.max(left, Math.min(x2, clip[2]));
-        bounds[3] = Math.max(top, Math.min(y2, clip[3]));
-        return bounds[index];
-    }
-
     public static Component fitLabel(Object entry, Component label) {
         var ours = screen.get();
         if (ours == null || Minecraft.getInstance().screen != ours) return label;
@@ -237,13 +215,13 @@ public final class StylePreviewOverlay {
 
         float offset = marqueeOffset(now - marqueeStart, textWidth - limit);
 
-        list.pushClip(rowX, rowY + 3, limit, font.lineHeight + 5);
+        rowGraphics.enableScissor(rowX, rowY + 3, rowX + limit, rowY + 3 + font.lineHeight + 5);
         var pose = rowGraphics.pose();
         pose.pushPose();
         pose.translate(-offset, 0f, 0f);
         rowGraphics.drawString(font, label, rowX, rowY + 6, 0xFFFFFF, true);
         pose.popPose();
-        list.popClip();
+        rowGraphics.disableScissor();
     }
 
     private static float marqueeOffset(long elapsedMs, float overflow) {

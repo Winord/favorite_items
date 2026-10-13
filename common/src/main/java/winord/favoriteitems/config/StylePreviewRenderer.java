@@ -1,6 +1,7 @@
 package winord.favoriteitems.config;
 
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -47,7 +48,7 @@ public final class StylePreviewRenderer {
         var settings = data.settings().get();
         int ix = x + 1, iy = y + 1;
 
-        graphics.blit(SLOT_BACKGROUND, x, y, 0, 0, SLOT_FRAME_SIZE, SLOT_FRAME_SIZE, SLOT_FRAME_SIZE, SLOT_FRAME_SIZE);
+        graphics.blit(RenderType::guiTextured, SLOT_BACKGROUND, x, y, 0f, 0f, SLOT_FRAME_SIZE, SLOT_FRAME_SIZE, SLOT_FRAME_SIZE, SLOT_FRAME_SIZE);
 
         if (settings.backgroundEnabled) {
             graphics.fill(ix, iy, ix + 16, iy + 16, settings.backgroundArgb());

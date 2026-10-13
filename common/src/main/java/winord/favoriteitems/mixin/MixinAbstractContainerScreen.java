@@ -64,7 +64,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
     @Unique private double favoriteitems$keyDragY;
 
     @Shadow
-    private Slot findSlot(double mouseX, double mouseY) {
+    private Slot getHoveredSlot(double mouseX, double mouseY) {
         throw new AssertionError();
     }
 
@@ -257,7 +257,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
     private void favoriteitems$toggleOnKeyClick(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         if (FavoriteSlots.isSuspended() || button != 0) return;
 
-        var slot = findSlot(mouseX, mouseY);
+        var slot = getHoveredSlot(mouseX, mouseY);
         if (slot == null || !slot.hasItem() || !favoriteitems$isFavoriteKeyDown() || !menu.getCarried().isEmpty()) return;
 
         var index = favoriteitems$indexOf(slot);
@@ -284,7 +284,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
         var dy = mouseY - favoriteitems$keyDragY;
         var steps = Math.max(1, (int) Math.ceil(Math.max(Math.abs(dx), Math.abs(dy)) / 4.0));
         for (int i = 1; i <= steps; i++) {
-            favoriteitems$applyKeyDrag(findSlot(favoriteitems$keyDragX + dx * i / steps, favoriteitems$keyDragY + dy * i / steps));
+            favoriteitems$applyKeyDrag(getHoveredSlot(favoriteitems$keyDragX + dx * i / steps, favoriteitems$keyDragY + dy * i / steps));
         }
 
         favoriteitems$keyDragX = mouseX;
@@ -350,7 +350,10 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
             graphics.pose().popPose();
         }
 
+        graphics.pose().pushPose();
+        graphics.pose().translate(0f, 0f, ITEM_Z);
         RenderUtil.renderActiveIcon(graphics, true, x, y, 1f);
+        graphics.pose().popPose();
     }
 
     @Inject(method = "slotClicked", at = @At("TAIL"))

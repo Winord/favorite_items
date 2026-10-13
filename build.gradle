@@ -27,7 +27,7 @@ subprojects {
     }
 
     group = rootProject.maven_group
-    version = "${rootProject.mod_version}+${rootProject.minecraft_version}"
+    version = "${rootProject.mod_version}+${rootProject.minecraft_label}"
 
     java {
         sourceCompatibility = JavaVersion.toVersion(rootProject.java_version)

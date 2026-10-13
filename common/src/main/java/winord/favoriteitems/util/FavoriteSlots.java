@@ -181,7 +181,7 @@ public final class FavoriteSlots {
 
     private static Item itemOf(String itemId) {
         var id = itemId == null ? null : ResourceLocation.tryParse(itemId);
-        return id == null ? UNLEARNED : BuiltInRegistries.ITEM.get(id);
+        return id == null ? UNLEARNED : BuiltInRegistries.ITEM.getValue(id);
     }
 
     public static boolean isSuspended() {
