@@ -23,6 +23,7 @@ public final class StylePreviewOverlay {
         void closeDropdownsOutside(double mouseX, double mouseY);
         int labelLimit(Object entry);
         void paintFrame(GuiGraphics graphics, Object widget);
+        void syncVisibility();
     }
 
     private record Section(FavoriteStyle style, Object entry, BooleanSupplier expanded) { }
@@ -105,6 +106,7 @@ public final class StylePreviewOverlay {
         var list = listAccess.get();
         if (list == null) return;
 
+        list.syncVisibility();
         panelActive = false;
         list.setBounds(0, target.width);
         if (tab.get() == Tab.OTHER) return;

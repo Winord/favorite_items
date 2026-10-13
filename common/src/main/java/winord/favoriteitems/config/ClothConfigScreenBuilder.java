@@ -153,6 +153,10 @@ public final class ClothConfigScreenBuilder {
         return new StylePreviewOverlay.ListAccess() {
             @Override public int top() { return list.top; }
             @Override public int bottom() { return list.bottom; }
+            @Override public void syncVisibility() {
+                list.tickList();
+                list.tickList();
+            }
             @Override public void paintFrame(GuiGraphics graphics, Object widget) {
                 if (widget != list) return;
 
