@@ -1,7 +1,6 @@
 package winord.favoriteitems.config;
 
 import net.minecraft.util.Util;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineTextWidget;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
@@ -43,12 +42,6 @@ public final class MissingClothScreen extends Screen {
                 .pos(width / 2 - 115, height / 2 + 14)
                 .size(230, 20)
                 .build());
-    }
-
-    @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        extractBackground(graphics, mouseX, mouseY, partialTick);
-        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
     }
 
     @Override
