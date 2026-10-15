@@ -25,6 +25,7 @@
     "MixinGui",
     "MixinClothEntryLabel",
     "MixinClothListEntryRow",
-    "MixinClothListFrame"
+    "MixinClothListFrame",
+    "MixinClothListRows"
   ]
 }

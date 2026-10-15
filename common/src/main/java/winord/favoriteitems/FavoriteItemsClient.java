@@ -36,11 +36,10 @@ public final class FavoriteItemsClient {
         ToggleKeybinds.register();
 
         ClientGuiEvent.INIT_POST.register((screen, access) -> StylePreviewOverlay.onInit(screen));
-        ClientGuiEvent.RENDER_POST.register((screen, graphics, mouseX, mouseY, delta) ->
-                StylePreviewOverlay.render(screen, graphics, mouseX, mouseY));
         ClientScreenInputEvent.MOUSE_CLICKED_PRE.register((client, screen, event, doubleClick) -> {
-            StylePreviewOverlay.onMouseClicked(screen, event.x(), event.y());
-            return EventResult.pass();
+            return StylePreviewOverlay.onMouseClicked(screen, event.x(), event.y())
+                    ? EventResult.interruptFalse()
+                    : EventResult.pass();
         });
 
         ClientPlayerEvent.CLIENT_PLAYER_JOIN.register(player -> {

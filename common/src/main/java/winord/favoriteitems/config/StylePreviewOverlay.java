@@ -22,6 +22,7 @@ public final class StylePreviewOverlay {
         Object sectionAt(int mouseY);
         void closeDropdownsOutside(double mouseX, double mouseY);
         int labelLimit(Object entry);
+        boolean owns(Object widget);
         void paintFrame(GuiGraphicsExtractor graphics, Object widget);
         void syncVisibility();
     }
@@ -34,7 +35,7 @@ public final class StylePreviewOverlay {
     private static final int CLOTH_SCROLLBAR_MARGIN = 30;
     private static final int SCROLLBAR_GAP = 3;
     private static final int PADDING = 4;
-    private static final int PANEL_BACKGROUND = 0xFF0A0805;
+    private static final int PANEL_BACKGROUND = 0x1A000000;
     private static final int DIVIDER = 0x40FFFFFF;
     private static final int BACKGROUND = 0xF0100010;
     private static final int BORDER_TOP = 0x505000FF;
@@ -63,6 +64,7 @@ public final class StylePreviewOverlay {
     private static long marqueeStart, marqueeSeen;
 
     private static boolean panelActive;
+    private static boolean rowsClipped;
     private static int panelLeft, panelTop, panelRight, panelBottom;
     private static int boxWidth, previewScale;
 
@@ -109,7 +111,7 @@ public final class StylePreviewOverlay {
         list.syncVisibility();
         panelActive = false;
         list.setBounds(0, target.width);
-        if (tab.get() == Tab.OTHER) return;
+        if (syncTab() == Tab.OTHER) return;
 
         var font = Minecraft.getInstance().font;
         previewScale = target.width >= LARGE_PREVIEW_MIN_WIDTH ? 4 : 3;
@@ -129,28 +131,40 @@ public final class StylePreviewOverlay {
         panelActive = true;
     }
 
-    public static void onMouseClicked(Screen target, double mouseX, double mouseY) {
-        if (target != screen.get()) return;
+    public static boolean onMouseClicked(Screen target, double mouseX, double mouseY) {
+        if (target != screen.get()) return false;
 
         var list = listAccess.get();
         if (list != null) list.closeDropdownsOutside(mouseX, mouseY);
+        return panelActive && mouseX >= panelLeft && mouseY >= panelTop && mouseY < panelBottom;
     }
 
-    public static void render(Screen target, GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
-        if (target != screen.get()) return;
+    public static int listMouseX(Object widget, int mouseX) {
+        if (!panelActive || mouseX < panelLeft) return mouseX;
 
+        var ours = screen.get();
+        if (ours == null || Minecraft.getInstance().screen != ours) return mouseX;
+
+        var list = listAccess.get();
+        return list != null && list.owns(widget) ? -1 : mouseX;
+    }
+
+    private static Tab syncTab() {
         var currentTab = tab.get();
         if (currentTab != lastTab) {
             lastTab = currentTab;
             current = null;
         }
+        return currentTab;
+    }
 
-        var style = switch (currentTab) {
+    private static void drawPanel(GuiGraphicsExtractor graphics, int mouseY) {
+        var style = switch (syncTab()) {
             case GENERAL -> activeStyle.get();
             case STYLES -> stylesTabStyle(mouseY);
             case OTHER -> null;
         };
-        if (style == null || !panelActive) return;
+        if (style == null) return;
 
         draw(graphics, style);
     }
@@ -171,12 +185,33 @@ public final class StylePreviewOverlay {
         return current;
     }
 
-    public static void paintListFrame(Object widget, GuiGraphicsExtractor graphics) {
+    public static void paintListFrame(Object widget, GuiGraphicsExtractor graphics, int mouseY) {
         var ours = screen.get();
         if (ours == null || Minecraft.getInstance().screen != ours || !panelActive) return;
 
         var list = listAccess.get();
-        if (list != null) list.paintFrame(graphics, widget);
+        if (list == null || !list.owns(widget)) return;
+
+        list.paintFrame(graphics, widget);
+        drawPanel(graphics, mouseY);
+    }
+
+    public static void beginRowsClip(Object widget, GuiGraphicsExtractor graphics) {
+        var ours = screen.get();
+        if (ours == null || Minecraft.getInstance().screen != ours || !panelActive) return;
+
+        var list = listAccess.get();
+        if (list == null || !list.owns(widget)) return;
+
+        graphics.enableScissor(0, list.top(), panelLeft, list.bottom());
+        rowsClipped = true;
+    }
+
+    public static void endRowsClip(GuiGraphicsExtractor graphics) {
+        if (!rowsClipped) return;
+
+        rowsClipped = false;
+        graphics.disableScissor();
     }
 
     public static Component fitLabel(Object entry, Component label) {

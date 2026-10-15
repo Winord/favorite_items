@@ -157,6 +157,7 @@ public final class ClothConfigScreenBuilder {
                 list.tickList();
                 list.tickList();
             }
+            @Override public boolean owns(Object widget) { return widget == list; }
             @Override public void paintFrame(GuiGraphicsExtractor graphics, Object widget) {
                 if (widget != list) return;
 
