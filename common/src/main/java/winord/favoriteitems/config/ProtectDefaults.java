@@ -33,7 +33,7 @@ public final class ProtectDefaults {
                     "#minecraft:candle_cakes", "#minecraft:flower_pots", "minecraft:cake", "minecraft:respawn_anchor",
                     "minecraft:decorated_pot", "minecraft:composter", "minecraft:jukebox", "minecraft:bell",
                     "minecraft:beehive", "minecraft:bee_nest", "minecraft:sweet_berry_bush", "minecraft:cave_vines",
-                    "minecraft:cave_vines_plant", "minecraft:chiseled_bookshelf", "minecraft:vault");
+                    "minecraft:cave_vines_plant", "minecraft:chiseled_bookshelf", "minecraft:vault", "#minecraft:wooden_shelves");
         };
     }
 }

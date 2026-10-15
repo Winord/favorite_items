@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
@@ -151,7 +152,7 @@ public final class DeathFavorites {
         if (lost == null || lost.isEmpty()) return;
 
         lostFavorites = lost;
-        record = new DeathRecord(player.level().dimension().location().toString(), player.position(),
+        record = new DeathRecord(player.level().dimension().identifier().toString(), player.position(),
                 player.level().getGameTime(), System.currentTimeMillis());
         for (var held : lost) record.add(held.stack());
         FavoriteSlots.save();
@@ -263,7 +264,9 @@ public final class DeathFavorites {
         var items = new JsonArray();
         for (var item : record.items) {
             var entry = new JsonObject();
-            entry.addProperty("item", item.template.save(registries()).toString());
+            var encoded = ItemStack.CODEC.encodeStart(registries().createSerializationContext(NbtOps.INSTANCE), item.template).result();
+            if (encoded.isEmpty()) continue;
+            entry.addProperty("item", encoded.get().toString());
             entry.addProperty("count", item.remaining);
             items.add(entry);
         }
@@ -282,7 +285,7 @@ public final class DeathFavorites {
 
             for (var element : json.getAsJsonArray("items")) {
                 var entry = element.getAsJsonObject();
-                var stack = ItemStack.parse(registries(), TagParser.parseTag(entry.get("item").getAsString())).orElse(ItemStack.EMPTY);
+                var stack = ItemStack.CODEC.parse(registries().createSerializationContext(NbtOps.INSTANCE), TagParser.parseCompoundFully(entry.get("item").getAsString())).result().orElse(ItemStack.EMPTY);
                 int count = entry.get("count").getAsInt();
                 if (stack.isEmpty() || count <= 0) continue;
 
@@ -308,7 +311,7 @@ public final class DeathFavorites {
     private static boolean isNearDeathSite(Minecraft minecraft) {
         var player = minecraft.player;
         return player != null
-                && player.level().dimension().location().toString().equals(record.dimension)
+                && player.level().dimension().identifier().toString().equals(record.dimension)
                 && player.position().distanceToSqr(record.pos) <= RETURN_RADIUS * RETURN_RADIUS;
     }
 

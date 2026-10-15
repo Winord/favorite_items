@@ -2,13 +2,13 @@ package winord.favoriteitems.util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Shearable;
-import net.minecraft.world.entity.animal.Wolf;
+import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.animal.armadillo.Armadillo;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.AxeItem;
@@ -44,8 +44,8 @@ public final class ToolGuard {
     public static final String SHEARS = "config." + MOD_ID + ".shears_protect";
     public static final String BRUSH = "config." + MOD_ID + ".brush_protect";
 
-    private static final TagKey<Item> SHEARS_TAG_FABRIC = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "shears"));
-    private static final TagKey<Item> SHEARS_TAG_TOOLS = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "tools/shear"));
+    private static final TagKey<Item> SHEARS_TAG_FABRIC = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "shears"));
+    private static final TagKey<Item> SHEARS_TAG_TOOLS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "tools/shear"));
 
     private ToolGuard() { }
 

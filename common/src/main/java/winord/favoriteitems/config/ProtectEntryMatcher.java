@@ -3,7 +3,7 @@ package winord.favoriteitems.config;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -27,13 +27,13 @@ public final class ProtectEntryMatcher {
 
     private static final int MAX_GROUP_DEPTH = 16;
 
-    private final Set<ResourceLocation> ids;
+    private final Set<Identifier> ids;
     private final Set<String> namespaces;
-    private final List<ResourceLocation> tags;
+    private final List<Identifier> tags;
     private final boolean everything;
 
     private ProtectEntryMatcher(
-            Set<ResourceLocation> ids, Set<String> namespaces, List<ResourceLocation> tags, boolean everything)
+            Set<Identifier> ids, Set<String> namespaces, List<Identifier> tags, boolean everything)
     {
         this.ids = ids;
         this.namespaces = namespaces;
@@ -50,9 +50,9 @@ public final class ProtectEntryMatcher {
     }
 
     private static final class Builder {
-        final Set<ResourceLocation> ids = new HashSet<>();
+        final Set<Identifier> ids = new HashSet<>();
         final Set<String> namespaces = new HashSet<>();
-        final Set<ResourceLocation> tags = new LinkedHashSet<>();
+        final Set<Identifier> tags = new LinkedHashSet<>();
         boolean everything;
 
         void addAll(List<String> entries, List<String> path) {
@@ -121,10 +121,10 @@ public final class ProtectEntryMatcher {
 
     public boolean matchesEntity(Entity entity) {
         var type = entity.getType();
-        return matches(EntityType.getKey(type), tag -> type.is(TagKey.create(Registries.ENTITY_TYPE, tag)));
+        return matches(EntityType.getKey(type), tag -> type.builtInRegistryHolder().is(TagKey.create(Registries.ENTITY_TYPE, tag)));
     }
 
-    private boolean matches(ResourceLocation key, Predicate<ResourceLocation> hasTag) {
+    private boolean matches(Identifier key, Predicate<Identifier> hasTag) {
         if (everything || ids.contains(key) || namespaces.contains(key.getNamespace())) return true;
 
         for (var tag : tags) {
@@ -137,11 +137,11 @@ public final class ProtectEntryMatcher {
 
     private static final class Entry {
         final Kind kind;
-        final ResourceLocation location;
+        final Identifier location;
         final String groupName;
         final String text;
 
-        private Entry(Kind kind, ResourceLocation location, String groupName, String text) {
+        private Entry(Kind kind, Identifier location, String groupName, String text) {
             this.kind = kind;
             this.location = location;
             this.groupName = groupName;
@@ -162,19 +162,19 @@ public final class ProtectEntryMatcher {
             }
 
             if (text.startsWith("#")) {
-                var tag = ResourceLocation.tryParse(text.substring(1));
+                var tag = Identifier.tryParse(text.substring(1));
                 return tag != null ? new Entry(Kind.TAG, tag, null, text) : null;
             }
 
             if (text.endsWith(":*")) {
                 var namespace = text.substring(0, text.length() - 2);
-                var probe = ResourceLocation.tryParse(namespace + ":_");
+                var probe = Identifier.tryParse(namespace + ":_");
                 return probe != null && probe.getNamespace().equals(namespace)
                         ? new Entry(Kind.NAMESPACE, probe, null, text)
                         : null;
             }
 
-            var id = ResourceLocation.tryParse(text);
+            var id = Identifier.tryParse(text);
             return id != null ? new Entry(Kind.ID, id, null, text) : null;
         }
     }

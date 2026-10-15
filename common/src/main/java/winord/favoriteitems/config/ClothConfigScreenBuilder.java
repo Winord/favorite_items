@@ -16,11 +16,11 @@ import me.shedaniel.clothconfig2.gui.entries.StringListListEntry;
 import me.shedaniel.clothconfig2.gui.entries.SubCategoryListEntry;
 import me.shedaniel.clothconfig2.gui.entries.TextFieldListEntry;
 import me.shedaniel.clothconfig2.gui.widget.DynamicEntryListWidget;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import winord.favoriteitems.FavoriteItems;
 import winord.favoriteitems.compat.ipn.IpnCompat;
@@ -130,13 +130,13 @@ public final class ClothConfigScreenBuilder {
     private static Method holeMethod;
     private static boolean holeFailed;
 
-    private static void paintHole(GuiGraphics graphics, DynamicEntryListWidget<?> list, int from, int to) {
+    private static void paintHole(GuiGraphicsExtractor graphics, DynamicEntryListWidget<?> list, int from, int to) {
         if (holeFailed) return;
 
         try {
             if (holeMethod == null) {
                 holeMethod = DynamicEntryListWidget.class.getDeclaredMethod("renderHoleBackground",
-                        GuiGraphics.class, int.class, int.class, int.class, int.class);
+                        GuiGraphicsExtractor.class, int.class, int.class, int.class, int.class);
                 holeMethod.setAccessible(true);
             }
             holeMethod.invoke(list, graphics, from, to, 255, 255);
@@ -157,7 +157,7 @@ public final class ClothConfigScreenBuilder {
                 list.tickList();
                 list.tickList();
             }
-            @Override public void paintFrame(GuiGraphics graphics, Object widget) {
+            @Override public void paintFrame(GuiGraphicsExtractor graphics, Object widget) {
                 if (widget != list) return;
 
                 int from = list.left + list.width;
@@ -175,8 +175,8 @@ public final class ClothConfigScreenBuilder {
                     list.left = savedLeft;
                     list.width = savedWidth;
                 }
-                graphics.blit(RenderType::guiTextured, Screen.HEADER_SEPARATOR, from, list.top - 2, 0f, 0f, to - from, 2, 32, 2);
-                graphics.blit(RenderType::guiTextured, Screen.FOOTER_SEPARATOR, from, list.bottom, 0f, 0f, to - from, 2, 32, 2);
+                graphics.blit(RenderPipelines.GUI_TEXTURED, Screen.HEADER_SEPARATOR, from, list.top - 2, 0f, 0f, to - from, 2, 32, 2, -1);
+                graphics.blit(RenderPipelines.GUI_TEXTURED, Screen.FOOTER_SEPARATOR, from, list.bottom, 0f, 0f, to - from, 2, 32, 2, -1);
             }
             @Override public void setBounds(int left, int width) {
                 list.left = left;

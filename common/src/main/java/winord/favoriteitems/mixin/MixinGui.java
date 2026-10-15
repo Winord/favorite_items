@@ -3,7 +3,7 @@ package winord.favoriteitems.mixin;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -31,7 +31,7 @@ public abstract class MixinGui implements ExtensionGui {
 
     @Override
     public void favoriteitems$flashIcon() {
-        favoriteitems$flashIcon(getCameraPlayer().getInventory().selected);
+        favoriteitems$flashIcon(getCameraPlayer().getInventory().getSelectedSlot());
     }
 
     @Override
@@ -86,9 +86,9 @@ public abstract class MixinGui implements ExtensionGui {
         return x == favoriteitems$slotX(FavoriteSlots.OFFHAND_INDEX) && FavoriteSlots.isFavorite(FavoriteSlots.OFFHAND_INDEX);
     }
 
-    @Inject(method = "renderSlot", at = @At("HEAD"))
+    @Inject(method = "extractSlot", at = @At("HEAD"))
     private void favoriteitems$renderIconUnderItem(
-            GuiGraphics graphics, int x, int y, DeltaTracker deltaTracker, Player player, ItemStack stack, int seed, CallbackInfo ci)
+            GuiGraphicsExtractor graphics, int x, int y, DeltaTracker deltaTracker, Player player, ItemStack stack, int seed, CallbackInfo ci)
     {
         if (!FavoriteItemsConfig.activeSettings().drawsLayers(false)) return;
 
@@ -96,8 +96,8 @@ public abstract class MixinGui implements ExtensionGui {
         if (alpha > 0f) RenderUtil.renderActiveIcon(graphics, false, x, y, alpha);
     }
 
-    @Inject(method = "renderItemHotbar", at = @At("TAIL"))
-    private void favoriteitems$renderIconAboveItem(GuiGraphics graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
+    @Inject(method = "extractItemHotbar", at = @At("TAIL"))
+    private void favoriteitems$renderIconAboveItem(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         if (!FavoriteItemsConfig.activeSettings().drawsLayers(true)) return;
 
         var mode = FavoriteItemsConfig.hotbarIndicatorMode;

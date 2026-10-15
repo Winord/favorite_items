@@ -11,7 +11,7 @@ import winord.favoriteitems.util.FavoriteSlots;
 import java.util.List;
 
 @Pseudo
-@Mixin(targets = "com.nemonotfound.nemos.inventory.sorting.client.gui.components.AbstractSingleClickButton")
+@Mixin(targets = "com.nemonotfound.nemos.inventory.sorting.gui.components.buttons.AbstractSingleClickButton")
 public abstract class MixinAbstractSingleClickButton {
     @ModifyVariable(method = "triggerClickForAllItems", at = @At("HEAD"), argsOnly = true, require = 0, remap = false)
     private List<Integer> favoriteitems$skipFavoriteSlots(List<Integer> slotIndices) {

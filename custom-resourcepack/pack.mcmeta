@@ -1,6 +1,7 @@
 {
     "pack": {
-        "pack_format": 42,
+        "min_format": 84,
+        "max_format": 84,
         "description": "Favorite Items - Custom style & sound template.\nReplace custom_mask.png, custom_overlay.png and custom.ogg with your own, keep the file names and sizes (18x18 PNG, .ogg audio)."
     }
 }

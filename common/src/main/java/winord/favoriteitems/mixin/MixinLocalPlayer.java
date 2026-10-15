@@ -3,7 +3,6 @@ package winord.favoriteitems.mixin;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
@@ -25,7 +24,7 @@ public abstract class MixinLocalPlayer extends Player {
             return;
         }
 
-        var selected = this.getInventory().selected;
+        var selected = this.getInventory().getSelectedSlot();
         if (!FavoriteSlots.isFavorite(selected)) return;
 
         var stack = this.getInventory().getItem(selected);
@@ -42,7 +41,7 @@ public abstract class MixinLocalPlayer extends Player {
         cir.setReturnValue(false);
     }
 
-    public MixinLocalPlayer(Level level, BlockPos pos, float yaw, GameProfile gameProfile) {
-        super(level, pos, yaw, gameProfile);
+    public MixinLocalPlayer(Level level, GameProfile gameProfile) {
+        super(level, gameProfile);
     }
 }

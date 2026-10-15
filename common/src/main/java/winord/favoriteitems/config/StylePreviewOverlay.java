@@ -1,8 +1,8 @@
 package winord.favoriteitems.config;
 
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -22,7 +22,7 @@ public final class StylePreviewOverlay {
         Object sectionAt(int mouseY);
         void closeDropdownsOutside(double mouseX, double mouseY);
         int labelLimit(Object entry);
-        void paintFrame(GuiGraphics graphics, Object widget);
+        void paintFrame(GuiGraphicsExtractor graphics, Object widget);
         void syncVisibility();
     }
 
@@ -56,7 +56,7 @@ public final class StylePreviewOverlay {
     private static Tab lastTab;
 
     private static Object rowEntry;
-    private static GuiGraphics rowGraphics;
+    private static GuiGraphicsExtractor rowGraphics;
     private static int rowX, rowY, rowMouseX, rowMouseY;
     private static long rowStamp;
     private static Object marqueeEntry;
@@ -90,7 +90,7 @@ public final class StylePreviewOverlay {
         marqueeEntry = null;
     }
 
-    public static void beginRow(Object entry, GuiGraphics graphics, int x, int y, int mouseX, int mouseY) {
+    public static void beginRow(Object entry, GuiGraphicsExtractor graphics, int x, int y, int mouseX, int mouseY) {
         rowEntry = entry;
         rowGraphics = graphics;
         rowX = x;
@@ -136,7 +136,7 @@ public final class StylePreviewOverlay {
         if (list != null) list.closeDropdownsOutside(mouseX, mouseY);
     }
 
-    public static void render(Screen target, GuiGraphics graphics, int mouseX, int mouseY) {
+    public static void render(Screen target, GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         if (target != screen.get()) return;
 
         var currentTab = tab.get();
@@ -171,7 +171,7 @@ public final class StylePreviewOverlay {
         return current;
     }
 
-    public static void paintListFrame(Object widget, GuiGraphics graphics) {
+    public static void paintListFrame(Object widget, GuiGraphicsExtractor graphics) {
         var ours = screen.get();
         if (ours == null || Minecraft.getInstance().screen != ours || !panelActive) return;
 
@@ -228,10 +228,10 @@ public final class StylePreviewOverlay {
 
         rowGraphics.enableScissor(rowX, rowY + 3, rowX + limit, rowY + 3 + font.lineHeight + 5);
         var pose = rowGraphics.pose();
-        pose.pushPose();
-        pose.translate(-offset, 0f, 0f);
-        rowGraphics.drawString(font, label, rowX, rowY + 6, 0xFFFFFF, true);
-        pose.popPose();
+        pose.pushMatrix();
+        pose.translate(-offset, 0f);
+        rowGraphics.text(font, label, rowX, rowY + 6, 0xFFFFFFFF, true);
+        pose.popMatrix();
         rowGraphics.disableScissor();
     }
 
@@ -253,7 +253,7 @@ public final class StylePreviewOverlay {
         return Component.translatable(style.langKey());
     }
 
-    private static void draw(GuiGraphics graphics, FavoriteStyle style) {
+    private static void draw(GuiGraphicsExtractor graphics, FavoriteStyle style) {
         var font = Minecraft.getInstance().font;
         var title = titleOf(style);
 
@@ -275,13 +275,13 @@ public final class StylePreviewOverlay {
         graphics.fill(left + 1, top + height - 2, left + width - 1, top + height - 1, BORDER_BOTTOM);
         graphics.fill(left + width - 2, top + 2, left + width - 1, top + height - 2, BORDER_BOTTOM);
 
-        graphics.drawString(font, title, left + (width - font.width(title)) / 2, top + PADDING, 0xFFFFFF, false);
+        graphics.text(font, title, left + (width - font.width(title)) / 2, top + PADDING, 0xFFFFFFFF, false);
 
         var pose = graphics.pose();
-        pose.pushPose();
-        pose.translate(left + (width - slotPx) / 2f, top + PADDING + font.lineHeight + PADDING, 0f);
-        pose.scale(previewScale, previewScale, 1f);
+        pose.pushMatrix();
+        pose.translate(left + (width - slotPx) / 2f, top + PADDING + font.lineHeight + PADDING);
+        pose.scale(previewScale, previewScale);
         StylePreviewRenderer.drawSlot(graphics, StylePreviewRenderer.dataFor(style), 0, 0);
-        pose.popPose();
+        pose.popMatrix();
     }
 }

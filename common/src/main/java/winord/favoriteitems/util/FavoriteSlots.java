@@ -9,7 +9,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -180,7 +180,7 @@ public final class FavoriteSlots {
     }
 
     private static Item itemOf(String itemId) {
-        var id = itemId == null ? null : ResourceLocation.tryParse(itemId);
+        var id = itemId == null ? null : Identifier.tryParse(itemId);
         return id == null ? UNLEARNED : BuiltInRegistries.ITEM.getValue(id);
     }
 
@@ -426,7 +426,7 @@ public final class FavoriteSlots {
     }
 
     public static void onHandSwapRequested(Inventory inventory) {
-        int hotbarIndex = inventory.selected;
+        int hotbarIndex = inventory.getSelectedSlot();
         var hotbar = inventory.getItem(hotbarIndex);
         var offhand = inventory.getItem(OFFHAND_INDEX);
         if (ItemStack.matches(hotbar, offhand)) return;

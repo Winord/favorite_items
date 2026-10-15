@@ -38,8 +38,8 @@ public final class FavoriteItemsClient {
         ClientGuiEvent.INIT_POST.register((screen, access) -> StylePreviewOverlay.onInit(screen));
         ClientGuiEvent.RENDER_POST.register((screen, graphics, mouseX, mouseY, delta) ->
                 StylePreviewOverlay.render(screen, graphics, mouseX, mouseY));
-        ClientScreenInputEvent.MOUSE_CLICKED_PRE.register((client, screen, mouseX, mouseY, button) -> {
-            StylePreviewOverlay.onMouseClicked(screen, mouseX, mouseY);
+        ClientScreenInputEvent.MOUSE_CLICKED_PRE.register((client, screen, event, doubleClick) -> {
+            StylePreviewOverlay.onMouseClicked(screen, event.x(), event.y());
             return EventResult.pass();
         });
 

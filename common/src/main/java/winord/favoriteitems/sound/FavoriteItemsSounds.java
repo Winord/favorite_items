@@ -3,7 +3,7 @@ package winord.favoriteitems.sound;
 import dev.architectury.registry.registries.DeferredRegister;
 import dev.architectury.registry.registries.RegistrySupplier;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import winord.favoriteitems.config.FavoriteSoundStyle;
@@ -19,7 +19,7 @@ public final class FavoriteItemsSounds {
     private FavoriteItemsSounds() { }
 
     private static RegistrySupplier<SoundEvent> register(String name) {
-        return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(MOD_ID, name)));
+        return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath(MOD_ID, name)));
     }
 
     public static void register() {

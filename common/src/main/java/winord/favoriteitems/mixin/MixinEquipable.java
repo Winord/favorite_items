@@ -65,6 +65,6 @@ public abstract class MixinEquipable {
 
     @Unique
     private static int favoriteitems$handIndex(Player user, InteractionHand hand) {
-        return hand == InteractionHand.MAIN_HAND ? user.getInventory().selected : FavoriteSlots.OFFHAND_INDEX;
+        return hand == InteractionHand.MAIN_HAND ? user.getInventory().getSelectedSlot() : FavoriteSlots.OFFHAND_INDEX;
     }
 }

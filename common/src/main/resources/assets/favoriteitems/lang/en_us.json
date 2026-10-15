@@ -1,6 +1,6 @@
 {
   "key.favoriteitems.favorite_item": "Favorite Item",
-  "key.categories.favoriteitems": "Favorite Items",
+  "key.category.favoriteitems.main": "Favorite Items",
   "key.favoriteitems.toggle_protect": "Toggle Additional Protection",
   "key.favoriteitems.toggle_axe_protect": "Toggle Axes Protection",
   "key.favoriteitems.toggle_shovel_protect": "Toggle Shovels Protection",

@@ -6,7 +6,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.BowItem;
 import net.minecraft.world.item.CrossbowItem;
@@ -101,7 +101,7 @@ public final class ProtectGuard {
     }
 
     public static int findBuildableStack(Player player, ItemStack like) {
-        var items = player.getInventory().items;
+        var items = player.getInventory().getNonEquipmentItems();
         for (int i = 0; i < items.size(); i++) {
             var candidate = items.get(i);
             if (candidate.isEmpty() || !ItemStack.isSameItemSameComponents(like, candidate)) continue;
@@ -128,7 +128,7 @@ public final class ProtectGuard {
         if (wanted.isEmpty() || FavoriteSlots.isScreenClickActive() || Minecraft.getInstance().screen != null) return false;
 
         var inventory = player.getInventory();
-        int selected = inventory.selected;
+        int selected = inventory.getSelectedSlot();
         var held = inventory.getItem(selected);
         if (!ItemStack.isSameItemSameComponents(held, wanted) || !hidesFromBuilding(player, selected, held)) return false;
 
@@ -140,7 +140,7 @@ public final class ProtectGuard {
         var gameMode = Minecraft.getInstance().gameMode;
         if (menuSlot < 0 || gameMode == null) return false;
 
-        gameMode.handleInventoryMouseClick(menu.containerId, menuSlot, selected, ClickType.SWAP, player);
+        gameMode.handleContainerInput(menu.containerId, menuSlot, selected, ContainerInput.SWAP, player);
         return true;
     }
 
@@ -173,7 +173,7 @@ public final class ProtectGuard {
         ItemStack stack = player.getItemInHand(hand);
         if (!inScope(stack)) return false;
 
-        int index = hand == InteractionHand.MAIN_HAND ? player.getInventory().selected : FavoriteSlots.OFFHAND_INDEX;
+        int index = hand == InteractionHand.MAIN_HAND ? player.getInventory().getSelectedSlot() : FavoriteSlots.OFFHAND_INDEX;
         if (!isTargeted(index)) return false;
 
         ProtectAction[] candidates = actions.get();

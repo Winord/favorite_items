@@ -1,14 +1,15 @@
 package winord.favoriteitems.mixin;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -34,14 +35,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static net.minecraft.world.inventory.ClickType.PICKUP;
+import static net.minecraft.world.inventory.ContainerInput.PICKUP;
 
 @Mixin(AbstractContainerScreen.class)
 public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> extends Screen
         implements ExtensionContainerScreen
 {
     @Unique private static final int NONE = -1;
-    @Unique private static final float ITEM_Z = 232f;
     @Unique private static final int QUICK_CRAFT_START = 0;
     @Unique private static final int QUICK_CRAFT_ADD = 1;
 
@@ -192,7 +192,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
 
         var sound = FavoriteItemsSounds.forStyle(FavoriteItemsConfig.soundStyle);
         if (sound != null) {
-            float pitch = (nowFavorite ? 1.0f : 0.8f) + minecraft.player.level().random.nextFloat() * 0.1f;
+            float pitch = (nowFavorite ? 1.0f : 0.8f) + minecraft.player.getRandom().nextFloat() * 0.1f;
             minecraft.player.playSound(sound, 0.4f, pitch);
         }
         return nowFavorite;
@@ -235,14 +235,14 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
     }
 
     @Inject(method = "slotClicked", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;handleInventoryMouseClick(IIILnet/minecraft/world/inventory/ClickType;Lnet/minecraft/world/entity/player/Player;)V"))
-    private void favoriteitems$markScreenClickStart(Slot slot, int slotId, int button, ClickType clickType, CallbackInfo ci) {
+            target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;handleContainerInput(IIILnet/minecraft/world/inventory/ContainerInput;Lnet/minecraft/world/entity/player/Player;)V"))
+    private void favoriteitems$markScreenClickStart(Slot slot, int slotId, int button, ContainerInput clickType, CallbackInfo ci) {
         FavoriteSlots.enterScreenClick();
     }
 
     @Inject(method = "slotClicked", at = @At(value = "INVOKE", shift = At.Shift.AFTER,
-            target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;handleInventoryMouseClick(IIILnet/minecraft/world/inventory/ClickType;Lnet/minecraft/world/entity/player/Player;)V"))
-    private void favoriteitems$markScreenClickEnd(Slot slot, int slotId, int button, ClickType clickType, CallbackInfo ci) {
+            target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;handleContainerInput(IIILnet/minecraft/world/inventory/ContainerInput;Lnet/minecraft/world/entity/player/Player;)V"))
+    private void favoriteitems$markScreenClickEnd(Slot slot, int slotId, int button, ContainerInput clickType, CallbackInfo ci) {
         FavoriteSlots.exitScreenClick();
     }
 
@@ -250,12 +250,13 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
     private boolean favoriteitems$isFavoriteKeyDown() {
         var key = ((KeyMappingAccessor) (Object) FavoriteItemsClient.FAVORITE_KEY).favoriteitems$getKey();
         return key.getType() == InputConstants.Type.KEYSYM
-                && InputConstants.isKeyDown(minecraft.getWindow().getWindow(), key.getValue());
+                && InputConstants.isKeyDown(minecraft.getWindow(), key.getValue());
     }
 
-    @Inject(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/Util;getMillis()J"), cancellable = true)
-    private void favoriteitems$toggleOnKeyClick(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
-        if (FavoriteSlots.isSuspended() || button != 0) return;
+    @Inject(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;matchesMouse(Lnet/minecraft/client/input/MouseButtonEvent;)Z"), cancellable = true)
+    private void favoriteitems$toggleOnKeyClick(MouseButtonEvent event, boolean doubleClick, CallbackInfoReturnable<Boolean> cir) {
+        double mouseX = event.x(), mouseY = event.y();
+        if (FavoriteSlots.isSuspended() || event.button() != 0) return;
 
         var slot = getHoveredSlot(mouseX, mouseY);
         if (slot == null || !slot.hasItem() || !favoriteitems$isFavoriteKeyDown() || !menu.getCarried().isEmpty()) return;
@@ -270,12 +271,11 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
     }
 
     @Inject(method = "mouseDragged", at = @At("HEAD"))
-    private void favoriteitems$dragToggle(
-            double mouseX, double mouseY, int button, double deltaX, double deltaY, CallbackInfoReturnable<Boolean> cir)
-    {
+    private void favoriteitems$dragToggle(MouseButtonEvent event, double deltaX, double deltaY, CallbackInfoReturnable<Boolean> cir) {
         if (favoriteitems$keyDragMode == 0) return;
 
-        if (button != 0 || FavoriteSlots.isSuspended() || !menu.getCarried().isEmpty() || !favoriteitems$isFavoriteKeyDown()) {
+        double mouseX = event.x(), mouseY = event.y();
+        if (event.button() != 0 || FavoriteSlots.isSuspended() || !menu.getCarried().isEmpty() || !favoriteitems$isFavoriteKeyDown()) {
             favoriteitems$keyDragMode = 0;
             return;
         }
@@ -292,8 +292,8 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
     }
 
     @Inject(method = "mouseReleased", at = @At("HEAD"))
-    private void favoriteitems$endKeyDrag(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
-        if (button == 0) favoriteitems$keyDragMode = 0;
+    private void favoriteitems$endKeyDrag(MouseButtonEvent event, CallbackInfoReturnable<Boolean> cir) {
+        if (event.button() == 0) favoriteitems$keyDragMode = 0;
     }
 
     @Unique
@@ -313,8 +313,8 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
         favoriteitems$trackCursorFavoriteReturn();
     }
 
-    @Inject(method = "renderSlot", at = @At("HEAD"))
-    private void favoriteitems$renderIconUnderItem(GuiGraphics graphics, Slot slot, CallbackInfo ci) {
+    @Inject(method = "extractSlot", at = @At("HEAD"))
+    private void favoriteitems$renderIconUnderItem(GuiGraphicsExtractor graphics, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
         if (!FavoriteSlots.isFavorite(favoriteitems$indexOf(slot))) return;
 
         var settings = FavoriteItemsConfig.activeSettings();
@@ -324,40 +324,30 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
         RenderUtil.renderActiveIcon(graphics, false, slot.x, slot.y, 1f);
     }
 
-    @Inject(method = "renderSlot", at = @At("TAIL"))
-    private void favoriteitems$renderIconAboveItem(GuiGraphics graphics, Slot slot, CallbackInfo ci) {
+    @Inject(method = "extractSlot", at = @At("TAIL"))
+    private void favoriteitems$renderIconAboveItem(GuiGraphicsExtractor graphics, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
         if (FavoriteSlots.isFavorite(favoriteitems$indexOf(slot))) {
             RenderUtil.renderActiveIcon(graphics, true, slot.x, slot.y, 1f);
         }
     }
 
-    @Inject(method = "render", at = @At("TAIL"))
-    private void favoriteitems$renderCursorIcon(GuiGraphics graphics, int mouseX, int mouseY, float partialTick, CallbackInfo ci) {
-        if (!favoriteitems$isCursorFavorite() || FavoriteSlots.isSuspended()) return;
+    @Inject(method = "extractCarriedItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;extractFloatingItem(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V"))
+    private void favoriteitems$renderCursorIconUnder(GuiGraphicsExtractor graphics, int mouseX, int mouseY, CallbackInfo ci) {
+        if (favoriteitems$cursorIconShown()) RenderUtil.renderActiveIcon(graphics, false, mouseX - 8, mouseY - 8, 1f);
+    }
 
-        var settings = FavoriteItemsConfig.activeSettings();
-        if (!settings.iconEnabled) return;
+    @Inject(method = "extractCarriedItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;extractFloatingItem(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", shift = At.Shift.AFTER))
+    private void favoriteitems$renderCursorIconAbove(GuiGraphicsExtractor graphics, int mouseX, int mouseY, CallbackInfo ci) {
+        if (favoriteitems$cursorIconShown()) RenderUtil.renderActiveIcon(graphics, true, mouseX - 8, mouseY - 8, 1f);
+    }
 
-        int x = mouseX - 8, y = mouseY - 8;
-        RenderUtil.renderActiveIcon(graphics, false, x, y, 1f);
-
-        var cursorStack = menu.getCarried();
-        if (settings.drawsLayers(false) && !cursorStack.isEmpty()) {
-            graphics.pose().pushPose();
-            graphics.pose().translate(0f, 0f, ITEM_Z);
-            graphics.renderItem(cursorStack, x, y);
-            graphics.renderItemDecorations(this.font, cursorStack, x, y);
-            graphics.pose().popPose();
-        }
-
-        graphics.pose().pushPose();
-        graphics.pose().translate(0f, 0f, ITEM_Z);
-        RenderUtil.renderActiveIcon(graphics, true, x, y, 1f);
-        graphics.pose().popPose();
+    @Unique
+    private boolean favoriteitems$cursorIconShown() {
+        return favoriteitems$isCursorFavorite() && !FavoriteSlots.isSuspended() && FavoriteItemsConfig.activeSettings().iconEnabled;
     }
 
     @Inject(method = "slotClicked", at = @At("TAIL"))
-    private void favoriteitems$followQuickMove(Slot slot, int slotId, int button, ClickType clickType, CallbackInfo ci) {
+    private void favoriteitems$followQuickMove(Slot slot, int slotId, int button, ContainerInput clickType, CallbackInfo ci) {
         if (favoriteitems$quickMoveOrigin == NONE) return;
 
         var origin = favoriteitems$quickMoveOrigin;
@@ -392,7 +382,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
 
     @Inject(method = "slotClicked", at = @At("HEAD"), cancellable = true)
     protected void applyFavoriteRules(
-            Slot slot, int slotId, int button, ClickType clickType, CallbackInfo ci)
+            Slot slot, int slotId, int button, ContainerInput clickType, CallbackInfo ci)
     {
         if (FavoriteSlots.isSuspended()) {
             favoriteitems$cursorFavorite = false;
@@ -406,7 +396,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
         if (cursorStack.isEmpty()) favoriteitems$cursorFavorite = false;
         var cursorIsFavorite = favoriteitems$cursorFavorite;
 
-        if (clickType == ClickType.QUICK_CRAFT) {
+        if (clickType == ContainerInput.QUICK_CRAFT) {
             favoriteitems$handleQuickCraft(slot, button, cursorIsFavorite, ci);
             return;
         }
@@ -530,9 +520,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
     }
 
     @Inject(method = "mouseDragged", at = @At(value = "INVOKE", target = "Ljava/util/Set;add(Ljava/lang/Object;)Z"), cancellable = true)
-    private void favoriteitems$blockDragSpread(
-            double mouseX, double mouseY, int button, double deltaX, double deltaY, CallbackInfoReturnable<Boolean> cir)
-    {
+    private void favoriteitems$blockDragSpread(MouseButtonEvent event, double deltaX, double deltaY, CallbackInfoReturnable<Boolean> cir) {
         if (favoriteitems$cursorFavorite && menu.getCarried().getCount() > 1 && !FavoriteSlots.isSuspended()) {
             cir.setReturnValue(true);
         }

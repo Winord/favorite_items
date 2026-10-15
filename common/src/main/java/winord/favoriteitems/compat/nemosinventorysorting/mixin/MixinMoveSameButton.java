@@ -12,12 +12,12 @@ import winord.favoriteitems.util.MoveSameFavorites;
 import java.util.List;
 
 @Pseudo
-@Mixin(targets = "com.nemonotfound.nemos.inventory.sorting.client.gui.components.MoveSameButton")
+@Mixin(targets = "com.nemonotfound.nemos.inventory.sorting.gui.components.buttons.MoveSameButton")
 public abstract class MixinMoveSameButton {
     @Inject(method = "getItemSlotsToInteractWith", at = @At("HEAD"), require = 0, remap = false)
     private void favoriteitems$leaveOneOfEachFavorite(AbstractContainerMenu menu, CallbackInfoReturnable<List<Integer>> cir) {
         int start = NemoReflect.startIndexOf(this);
-        int end = NemoReflect.endIndexOf(this, menu);
+        int end = NemoReflect.endIndexOf(this);
         MoveSameFavorites.leaveOneBehind(menu, slot -> slot.index >= start && slot.index < end);
     }
 }

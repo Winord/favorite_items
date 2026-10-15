@@ -5,7 +5,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import winord.favoriteitems.FavoriteItems;
 import winord.favoriteitems.config.FavoriteItemsConfig;
@@ -200,7 +200,7 @@ public final class IpnCompat {
 
         var inventory = player.getInventory();
         int index = FavoriteSlots.playerInventoryIndex(menu.getSlot(menuSlot));
-        if (index != inventory.selected && index != FavoriteSlots.OFFHAND_INDEX) return -1;
+        if (index != inventory.getSelectedSlot() && index != FavoriteSlots.OFFHAND_INDEX) return -1;
 
         return ProtectGuard.protectsLastItem(player, index, inventory.getItem(index)) ? index : -1;
     }
@@ -342,14 +342,14 @@ public final class IpnCompat {
         }
     }
 
-    public static boolean cancelsScreenClick(Slot slot, int slotId, int button, ClickType clickType) {
+    public static boolean cancelsScreenClick(Slot slot, int slotId, int button, ContainerInput clickType) {
         if (!isLoaded() || !prepareHandler() || !prepareSettings()) return false;
 
         try {
             if (!Boolean.TRUE.equals(configValue.invoke(disableInteractionConfig))) return false;
             if (slot != null && Boolean.TRUE.equals(isMappedSlotLocked.invoke(lockHandler, slot))) return true;
 
-            return clickType == ClickType.SWAP && Boolean.TRUE.equals(isSlotLocked.invoke(lockHandler, button));
+            return clickType == ContainerInput.SWAP && Boolean.TRUE.equals(isSlotLocked.invoke(lockHandler, button));
         } catch (ReflectiveOperationException | RuntimeException e) {
             return false;
         }

@@ -5,6 +5,7 @@ import net.minecraft.world.inventory.Slot;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Pseudo;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Coerce;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import winord.favoriteitems.compat.clientsort.ClientSortCompat;
@@ -32,12 +33,12 @@ public abstract class MixinSingleUseOperator {
     }
 
     @Inject(method = "collectSlots", at = @At("HEAD"), require = 0, remap = false)
-    private void favoriteitems$beginCollecting(CallbackInfoReturnable<Slot[]> cir) {
+    private void favoriteitems$beginCollecting(Slot refSlot, @Coerce Object scope, CallbackInfoReturnable<Slot[]> cir) {
         ClientSortCompat.beginCollecting(this);
     }
 
     @Inject(method = "collectSlots", at = @At("RETURN"), require = 0, remap = false)
-    private void favoriteitems$endCollecting(CallbackInfoReturnable<Slot[]> cir) {
+    private void favoriteitems$endCollecting(Slot refSlot, @Coerce Object scope, CallbackInfoReturnable<Slot[]> cir) {
         ClientSortCompat.endCollecting();
     }
 }

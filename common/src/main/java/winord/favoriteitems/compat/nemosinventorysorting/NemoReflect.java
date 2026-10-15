@@ -1,13 +1,12 @@
 package winord.favoriteitems.compat.nemosinventorysorting;
 
-import net.minecraft.world.inventory.AbstractContainerMenu;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 public final class NemoReflect {
     private static Field startIndexField;
-    private static Method endIndexMethod;
+    private static Field endIndexField;
+    private static Method slotIndexMethod;
 
     private NemoReflect() { }
 
@@ -23,15 +22,26 @@ public final class NemoReflect {
         }
     }
 
-    public static int endIndexOf(Object sortButton, AbstractContainerMenu menu) {
+    public static int endIndexOf(Object button) {
         try {
-            if (endIndexMethod == null) {
-                endIndexMethod = findMethod(sortButton.getClass(), "calculateEndIndex");
-                endIndexMethod.setAccessible(true);
+            if (endIndexField == null) {
+                endIndexField = findField(button.getClass(), "currentEndIndex");
+                endIndexField.setAccessible(true);
             }
-            return (Integer) endIndexMethod.invoke(sortButton, menu);
+            return (Integer) endIndexField.get(button);
         } catch (ReflectiveOperationException e) {
-            throw new IllegalStateException("Nemo's Inventory Sorting compat: cannot read the end index", e);
+            throw new IllegalStateException("Nemo's Inventory Sorting compat: cannot read currentEndIndex", e);
+        }
+    }
+
+    public static int slotIndexOf(Object slotItem) {
+        try {
+            if (slotIndexMethod == null || slotIndexMethod.getDeclaringClass() != slotItem.getClass()) {
+                slotIndexMethod = slotItem.getClass().getMethod("slotIndex");
+            }
+            return (Integer) slotIndexMethod.invoke(slotItem);
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException("Nemo's Inventory Sorting compat: cannot read SlotItem.slotIndex", e);
         }
     }
 
@@ -43,14 +53,5 @@ public final class NemoReflect {
             }
         }
         throw new NoSuchFieldException(name);
-    }
-
-    private static Method findMethod(Class<?> type, String name) throws NoSuchMethodException {
-        for (; type != null; type = type.getSuperclass()) {
-            for (var method : type.getDeclaredMethods()) {
-                if (method.getName().equals(name) && method.getParameterCount() == 1) return method;
-            }
-        }
-        throw new NoSuchMethodException(name);
     }
 }

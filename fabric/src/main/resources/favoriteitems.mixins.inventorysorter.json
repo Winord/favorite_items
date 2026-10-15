@@ -1,12 +1,16 @@
 {
-  "required": true,
+  "required": false,
   "minVersion": "0.8",
   "package": "winord.favoriteitems.compat.inventorysorter.mixin",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_25",
   "injectors": {
-    "defaultRequire": 1
+    "defaultRequire": 0
   },
   "mixins": [
-    "MixinInventoryHelper"
+    "MixinClientFallbackSortPlanBuilder",
+    "MixinContainerInventorySorter",
+    "MixinPlayerInventorySorter",
+    "MixinSortPriorityRules",
+    "MixinSortedInventoryLayout"
   ]
 }

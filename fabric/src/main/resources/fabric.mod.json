@@ -27,18 +27,18 @@
         "favoriteitems.mixins.litematica.json"
     ],
     "depends": {
-        "fabricloader": "*",
+        "fabricloader": ">=0.18.5",
         "fabric-api": "*",
-        "architectury": ">=14",
-        "minecraft": ">=1.21.2 <1.21.4",
-        "java": ">=21"
+        "architectury": ">=20",
+        "minecraft": ">=26.1 <26.2",
+        "java": ">=25"
     },
     "suggests": {
         "cloth-config": "*",
         "modmenu": "*",
-        "inventory-sorting": "*",
+        "inventorysorter": "*",
         "clientsort": "*",
-        "nemos-inventory-sorting": "*",
+        "nemos_inventory_sorting": "*",
         "inventoryprofilesnext": "*",
         "litematica": "*"
     }

@@ -15,7 +15,7 @@ import winord.favoriteitems.util.FavoriteSlots;
 public abstract class MixinClientPacketListener {
     @Inject(method = "handleContainerContent", at = @At("TAIL"))
     private void favoriteitems$noteInventoryContent(ClientboundContainerSetContentPacket packet, CallbackInfo ci) {
-        if (packet.getContainerId() == 0) FavoriteSlots.onInventoryContent();
+        if (packet.containerId() == 0) FavoriteSlots.onInventoryContent();
     }
 
     @Inject(method = "handlePlayerCombatKill", at = @At("TAIL"))

@@ -3,11 +3,14 @@ package winord.favoriteitems.mixin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import org.spongepowered.asm.mixin.Mixin;
@@ -50,7 +53,7 @@ public abstract class MixinMultiPlayerGameMode {
 
     @Inject(method = "interact", at = @At("HEAD"), cancellable = true)
     private void favoriteitems$guardInteract(
-            Player player, Entity target, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir)
+            Player player, Entity target, EntityHitResult hit, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir)
     {
         if (favoriteitems$holdForHandSwap(cir)) return;
 
@@ -63,31 +66,41 @@ public abstract class MixinMultiPlayerGameMode {
         if (ProtectGuard.blocksEntityUse(player, hand, target)) favoriteitems$failProtected(player, hand, cir);
     }
 
-    @Inject(method = "interactAt", at = @At("HEAD"), cancellable = true)
-    private void favoriteitems$guardInteractAt(
-            Player player, Entity target, EntityHitResult hit, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir)
-    {
-        if (favoriteitems$holdForHandSwap(cir)) return;
+    @Inject(method = "handlePickItemFromBlock", at = @At("HEAD"))
+    private void favoriteitems$trackBlockPick(BlockPos pos, boolean includeData, CallbackInfo ci) {
+        var minecraft = Minecraft.getInstance();
+        var player = minecraft.player;
+        var level = minecraft.level;
+        if (player == null || level == null) return;
 
-        if (ProtectGuard.blocksEntityUse(player, hand, target)) favoriteitems$failProtected(player, hand, cir);
+        var stack = level.getBlockState(pos).getCloneItemStack(level, pos, includeData && player.hasInfiniteMaterials());
+        favoriteitems$trackPick(player, stack);
     }
 
-    @Inject(method = "handlePickItem", at = @At("HEAD"))
-    private void favoriteitems$trackPickItem(int slot, CallbackInfo ci) {
+    @Inject(method = "handlePickItemFromEntity", at = @At("HEAD"))
+    private void favoriteitems$trackEntityPick(Entity entity, boolean includeData, CallbackInfo ci) {
         var player = Minecraft.getInstance().player;
-        if (player != null) FavoriteSlots.onPickItemRequested(player.getInventory(), slot);
+        if (player != null) favoriteitems$trackPick(player, entity.getPickResult());
     }
 
-    @Inject(method = "handleInventoryMouseClick", at = @At("HEAD"), cancellable = true)
+    private static void favoriteitems$trackPick(LocalPlayer player, ItemStack picked) {
+        if (picked == null || picked.isEmpty()) return;
+
+        var inventory = player.getInventory();
+        int from = inventory.findSlotMatchingItem(picked);
+        if (from >= 0 && !Inventory.isHotbarSlot(from)) FavoriteSlots.onPickItemRequested(inventory, from);
+    }
+
+    @Inject(method = "handleContainerInput", at = @At("HEAD"), cancellable = true)
     private void favoriteitems$guardModClick(
-            int containerId, int slotId, int button, ClickType clickType, Player player, CallbackInfo ci)
+            int containerId, int slotId, int button, ContainerInput clickType, Player player, CallbackInfo ci)
     {
-        if (clickType == ClickType.SWAP) {
+        if (clickType == ContainerInput.SWAP) {
             if (LitematicaCompat.isPicking()) {
                 int usable = ProtectGuard.usableSwapSource(player, containerId, slotId);
                 if (usable >= 0) {
                     ci.cancel();
-                    ((MultiPlayerGameMode) (Object) this).handleInventoryMouseClick(containerId, usable, button, clickType, player);
+                    ((MultiPlayerGameMode) (Object) this).handleContainerInput(containerId, usable, button, clickType, player);
                     return;
                 }
             }

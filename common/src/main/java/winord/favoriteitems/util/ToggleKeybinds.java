@@ -3,6 +3,7 @@ package winord.favoriteitems.util;
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.architectury.registry.client.keymappings.KeyMappingRegistry;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.resources.Identifier;
 import winord.favoriteitems.config.FavoriteItemsConfig;
 
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.function.Consumer;
 import static winord.favoriteitems.FavoriteItems.MOD_ID;
 
 public final class ToggleKeybinds {
-    public static final String CATEGORY = "key.categories." + MOD_ID;
+    public static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath(MOD_ID, "main"));
 
     private record Toggle(KeyMapping key, String labelKey, BooleanSupplier get, Consumer<Boolean> set) { }
 
