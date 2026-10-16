@@ -34,6 +34,7 @@ public final class FavoriteItemsConfig {
     public static boolean hoeProtect = false;
     public static boolean shearsProtect = false;
     public static boolean brushProtect = false;
+    public static boolean toolsBreakingProtect = false;
 
     public static MoveSameFavoritesMode moveSameFavorites = MoveSameFavoritesMode.STAY;
 
@@ -96,6 +97,7 @@ public final class FavoriteItemsConfig {
         boolean hoeProtect = FavoriteItemsConfig.hoeProtect;
         boolean shearsProtect = FavoriteItemsConfig.shearsProtect;
         boolean brushProtect = FavoriteItemsConfig.brushProtect;
+        boolean toolsBreakingProtect = FavoriteItemsConfig.toolsBreakingProtect;
         boolean ipnRefillSkipsFavorites = FavoriteItemsConfig.ipnRefillSkipsFavorites;
         boolean ipnRefillProtectedLastItem = FavoriteItemsConfig.ipnRefillProtectedLastItem;
         boolean lobbyFavorites = FavoriteItemsConfig.lobbyFavorites;
@@ -124,6 +126,7 @@ public final class FavoriteItemsConfig {
             FavoriteItemsConfig.hoeProtect = hoeProtect;
             FavoriteItemsConfig.shearsProtect = shearsProtect;
             FavoriteItemsConfig.brushProtect = brushProtect;
+            FavoriteItemsConfig.toolsBreakingProtect = toolsBreakingProtect;
             FavoriteItemsConfig.ipnRefillSkipsFavorites = ipnRefillSkipsFavorites;
             FavoriteItemsConfig.ipnRefillProtectedLastItem = ipnRefillProtectedLastItem;
             FavoriteItemsConfig.lobbyFavorites = lobbyFavorites;

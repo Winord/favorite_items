@@ -1,12 +1,14 @@
 package winord.favoriteitems.util;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Shearable;
 import net.minecraft.world.entity.animal.wolf.Wolf;
 import net.minecraft.world.entity.animal.armadillo.Armadillo;
@@ -30,6 +32,8 @@ import net.minecraft.world.level.block.WeatheringCopper;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import winord.favoriteitems.config.FavoriteItemsConfig;
+import winord.favoriteitems.config.ProtectEntryMatcher;
+import winord.favoriteitems.config.ProtectVanilla;
 import winord.favoriteitems.mixin.AxeItemAccessor;
 import winord.favoriteitems.mixin.BrushItemAccessor;
 import winord.favoriteitems.mixin.HoeItemAccessor;
@@ -47,6 +51,8 @@ public final class ToolGuard {
     private static final TagKey<Item> SHEARS_TAG_FABRIC = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "shears"));
     private static final TagKey<Item> SHEARS_TAG_TOOLS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "tools/shear"));
 
+    private static final ProtectEntryMatcher SCREEN_BLOCKS = ProtectEntryMatcher.parse(ProtectVanilla.GUI_BLOCKS);
+
     private ToolGuard() { }
 
     public static boolean anyEnabled() {
@@ -54,6 +60,48 @@ public final class ToolGuard {
 
         return FavoriteItemsConfig.axeProtect || FavoriteItemsConfig.shovelProtect || FavoriteItemsConfig.hoeProtect
                 || FavoriteItemsConfig.shearsProtect || FavoriteItemsConfig.brushProtect;
+    }
+
+    public static boolean breakingProtectEnabled() {
+        return FavoriteItemsConfig.toolsBreakingProtect && !FavoriteSlots.isSuspended();
+    }
+
+    public static boolean isOnLastDurability(ItemStack stack) {
+        if (stack.isEmpty() || !stack.isDamageableItem()) return false;
+        if (stack.getMaxDamage() - stack.getDamageValue() > 1) return false;
+
+        var equippable = stack.get(DataComponents.EQUIPPABLE);
+        return equippable == null || !isArmorSlot(equippable.slot());
+    }
+
+    public static boolean blocksLastDurabilityUse(Player player, InteractionHand hand) {
+        if (!breakingProtectEnabled()) return false;
+
+        var stack = player.getItemInHand(hand);
+        if (!isOnLastDurability(stack)) return false;
+
+        ActionBarMessages.toolBreakBlocked(stack);
+        return true;
+    }
+
+    public static boolean blocksLastDurabilityBlockUse(Player player, InteractionHand hand, BlockHitResult hit) {
+        if (!breakingProtectEnabled()) return false;
+        if (!isOnLastDurability(player.getItemInHand(hand))) return false;
+        if (!player.isSecondaryUseActive() && opensScreen(player, hit)) return false;
+
+        return blocksLastDurabilityUse(player, hand);
+    }
+
+    private static boolean opensScreen(Player player, BlockHitResult hit) {
+        var level = player.level();
+        var pos = hit.getBlockPos();
+        var state = level.getBlockState(pos);
+        return state.getMenuProvider(level, pos) != null || SCREEN_BLOCKS.matchesBlock(state);
+    }
+
+    private static boolean isArmorSlot(EquipmentSlot slot) {
+        return slot == EquipmentSlot.HEAD || slot == EquipmentSlot.CHEST || slot == EquipmentSlot.LEGS
+                || slot == EquipmentSlot.FEET || slot == EquipmentSlot.BODY;
     }
 
     public static String blockingToggleForBlockUse(Player player, InteractionHand hand, BlockHitResult hit) {

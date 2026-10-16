@@ -4,6 +4,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 import winord.favoriteitems.config.FavoriteItemsConfig;
 import winord.favoriteitems.config.ProtectAction;
 
@@ -22,6 +23,10 @@ public final class ActionBarMessages {
 
     public static void toolBlocked(String toggleLabelKey) {
         show(Component.translatable("message." + MOD_ID + ".tool_blocked", Component.translatable(toggleLabelKey)));
+    }
+
+    public static void toolBreakBlocked(ItemStack stack) {
+        show(Component.translatable("message." + MOD_ID + ".tool_break_blocked", stack.getHoverName()));
     }
 
     public static void toggled(String labelKey, boolean on) {

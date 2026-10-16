@@ -48,11 +48,13 @@ public final class RenderUtil {
         int tint = settings.dyeableColor & 0xFFFFFF;
         var pose = graphics.pose();
 
-        if (settings.shadowEnabled) {
+        boolean dyeableShadow = dyeable && settings.dyeableShadowEnabled;
+        boolean fixedShadow = fixed && settings.staticShadowEnabled;
+        if (dyeableShadow || fixedShadow) {
             pose.pushMatrix();
             pose.translate(0.5f, 0.5f);
-            if (dyeable) blitLayer(graphics, mask, px, py, 0, dyeableAlpha * 0.25f);
-            if (fixed) blitLayer(graphics, overlay, px, py, 0, staticAlpha * 0.25f);
+            if (dyeableShadow) blitLayer(graphics, mask, px, py, 0, dyeableAlpha * 0.25f);
+            if (fixedShadow) blitLayer(graphics, overlay, px, py, 0, staticAlpha * 0.25f);
             pose.popMatrix();
         }
 

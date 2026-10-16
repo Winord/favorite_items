@@ -4,12 +4,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.PiercingWeapon;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -33,6 +35,11 @@ public abstract class MixinMultiPlayerGameMode {
     {
         if (favoriteitems$holdForHandSwap(cir)) return;
 
+        if (ToolGuard.blocksLastDurabilityUse(player, hand)) {
+            cir.setReturnValue(InteractionResult.FAIL);
+            return;
+        }
+
         if (ProtectGuard.blocksItemUse(player, hand)) favoriteitems$failProtected(player, hand, cir);
     }
 
@@ -41,6 +48,11 @@ public abstract class MixinMultiPlayerGameMode {
             LocalPlayer player, InteractionHand hand, BlockHitResult hit, CallbackInfoReturnable<InteractionResult> cir)
     {
         if (favoriteitems$holdForHandSwap(cir)) return;
+
+        if (ToolGuard.blocksLastDurabilityBlockUse(player, hand, hit)) {
+            cir.setReturnValue(InteractionResult.FAIL);
+            return;
+        }
 
         var blockingToggle = ToolGuard.blockingToggleForBlockUse(player, hand, hit);
         if (blockingToggle != null) {
@@ -57,6 +69,11 @@ public abstract class MixinMultiPlayerGameMode {
     {
         if (favoriteitems$holdForHandSwap(cir)) return;
 
+        if (ToolGuard.blocksLastDurabilityUse(player, hand)) {
+            cir.setReturnValue(InteractionResult.FAIL);
+            return;
+        }
+
         var blockingToggle = ToolGuard.blockingToggleForEntityUse(player, hand, target);
         if (blockingToggle != null) {
             favoriteitems$failTool(blockingToggle, cir);
@@ -64,6 +81,26 @@ public abstract class MixinMultiPlayerGameMode {
         }
 
         if (ProtectGuard.blocksEntityUse(player, hand, target)) favoriteitems$failProtected(player, hand, cir);
+    }
+
+    @Inject(method = "startDestroyBlock", at = @At("HEAD"), cancellable = true)
+    private void favoriteitems$guardStartDestroy(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
+        if (favoriteitems$blocksMainHandBreaking()) cir.setReturnValue(false);
+    }
+
+    @Inject(method = "continueDestroyBlock", at = @At("HEAD"), cancellable = true)
+    private void favoriteitems$guardContinueDestroy(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
+        if (favoriteitems$blocksMainHandBreaking()) cir.setReturnValue(false);
+    }
+
+    @Inject(method = "attack", at = @At("HEAD"), cancellable = true)
+    private void favoriteitems$guardAttack(Player player, Entity target, CallbackInfo ci) {
+        if (ToolGuard.blocksLastDurabilityUse(player, InteractionHand.MAIN_HAND)) ci.cancel();
+    }
+
+    @Inject(method = "piercingAttack", at = @At("HEAD"), cancellable = true)
+    private void favoriteitems$guardPiercingAttack(PiercingWeapon weapon, CallbackInfo ci) {
+        if (favoriteitems$blocksMainHandBreaking()) ci.cancel();
     }
 
     @Inject(method = "handlePickItemFromBlock", at = @At("HEAD"))
@@ -109,6 +146,11 @@ public abstract class MixinMultiPlayerGameMode {
         } else if (ExternalClickGuard.vetoes(player, containerId, slotId, button, clickType)) {
             ci.cancel();
         }
+    }
+
+    private static boolean favoriteitems$blocksMainHandBreaking() {
+        var player = Minecraft.getInstance().player;
+        return player != null && ToolGuard.blocksLastDurabilityUse(player, InteractionHand.MAIN_HAND);
     }
 
     private static boolean favoriteitems$holdForHandSwap(CallbackInfoReturnable<InteractionResult> cir) {

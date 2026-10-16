@@ -2,7 +2,7 @@ package winord.favoriteitems.config;
 
 import java.util.List;
 
-final class ProtectVanilla {
+public final class ProtectVanilla {
     private ProtectVanilla() { }
 
     public static final List<String> PLACEABLES = List.of(

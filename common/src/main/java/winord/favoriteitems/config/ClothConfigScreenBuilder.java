@@ -259,9 +259,11 @@ public final class ClothConfigScreenBuilder {
         tools.add(toolToggle(entryBuilder, "brush_protect", FavoriteItemsConfig.brushProtect, v -> FavoriteItemsConfig.brushProtect = v));
 
         category.addEntry(entryBuilder
-                .startSubCategory(Component.translatable(key("tools_protect")), tools)
+                .startSubCategory(Component.translatable(key("tools_interaction_protect")), tools)
                 .setExpanded(false)
                 .build());
+
+        category.addEntry(toolToggle(entryBuilder, "tools_breaking_protect", FavoriteItemsConfig.toolsBreakingProtect, v -> FavoriteItemsConfig.toolsBreakingProtect = v));
 
         if (MoveSameFavorites.isAnySortingModLoaded()) category.addEntry(buildSortingGroup(entryBuilder));
         if (IpnCompat.isLoaded()) category.addEntry(buildIpnGroup(entryBuilder));
@@ -537,6 +539,18 @@ public final class ClothConfigScreenBuilder {
                 .build();
     }
 
+    private static BooleanListEntry shadowToggle(
+            ConfigEntryBuilder entryBuilder, boolean current, boolean defaultValue, Requirement requirement, Consumer<Boolean> save)
+    {
+        return entryBuilder
+                .startBooleanToggle(Component.translatable(key("layer_shadow")), current)
+                .setDefaultValue(defaultValue)
+                .setTooltip(Component.translatable(key("layer_shadow.tooltip")))
+                .setRequirement(requirement)
+                .setSaveConsumer(save)
+                .build();
+    }
+
     private static SubCategoryListEntry group(ConfigEntryBuilder entryBuilder, String nameKey, AbstractConfigListEntry... entries) {
         List<AbstractConfigListEntry> list = new ArrayList<>(List.of(entries));
         return entryBuilder.startSubCategory(Component.translatable(nameKey), list).setExpanded(false).build();
@@ -597,6 +611,9 @@ public final class ClothConfigScreenBuilder {
         var dyeableOpacityEntry = percentSlider(entryBuilder, "layer_opacity", settings.dyeableOpacityPercent, defaults.dyeableOpacityPercent,
                 Requirement.isTrue(dyeableEnabledEntry), value -> settings.dyeableOpacityPercent = value);
 
+        var dyeableShadowEntry = shadowToggle(entryBuilder, settings.dyeableShadowEnabled, defaults.dyeableShadowEnabled,
+                Requirement.isTrue(dyeableEnabledEntry), value -> settings.dyeableShadowEnabled = value);
+
         var staticEnabledEntry = entryBuilder
                 .startBooleanToggle(Component.translatable(key("static_enabled")), settings.staticEnabled)
                 .setDefaultValue(defaults.staticEnabled)
@@ -619,6 +636,9 @@ public final class ClothConfigScreenBuilder {
         var staticOpacityEntry = percentSlider(entryBuilder, "layer_opacity", settings.staticOpacityPercent, defaults.staticOpacityPercent,
                 Requirement.isTrue(staticEnabledEntry), value -> settings.staticOpacityPercent = value);
 
+        var staticShadowEntry = shadowToggle(entryBuilder, settings.staticShadowEnabled, defaults.staticShadowEnabled,
+                Requirement.isTrue(staticEnabledEntry), value -> settings.staticShadowEnabled = value);
+
         var backgroundEnabledEntry = entryBuilder
                 .startBooleanToggle(Component.translatable(key("background_enabled")), settings.backgroundEnabled)
                 .setDefaultValue(defaults.backgroundEnabled)
@@ -637,14 +657,6 @@ public final class ClothConfigScreenBuilder {
         var backgroundOpacityEntry = percentSlider(entryBuilder, "background_opacity", settings.backgroundOpacityPercent, defaults.backgroundOpacityPercent,
                 Requirement.isTrue(backgroundEnabledEntry), value -> settings.backgroundOpacityPercent = value);
 
-        var shadowEnabledEntry = entryBuilder
-                .startBooleanToggle(Component.translatable(key("shadow_enabled")), settings.shadowEnabled)
-                .setDefaultValue(defaults.shadowEnabled)
-                .setTooltip(Component.translatable(key("shadow_enabled.tooltip")))
-                .setRequirement(Requirement.isTrue(iconEnabledEntry))
-                .setSaveConsumer(value -> settings.shadowEnabled = value)
-                .build();
-
         Supplier<StyleSettings> live = () -> {
             var s = new StyleSettings();
             s.iconEnabled = iconEnabledEntry.getValue();
@@ -659,7 +671,8 @@ public final class ClothConfigScreenBuilder {
             s.backgroundEnabled = backgroundEnabledEntry.getValue();
             s.backgroundColor = backgroundColorEntry.getValue();
             s.backgroundOpacityPercent = backgroundOpacityEntry.getValue();
-            s.shadowEnabled = shadowEnabledEntry.getValue();
+            s.dyeableShadowEnabled = dyeableShadowEntry.getValue();
+            s.staticShadowEnabled = staticShadowEntry.getValue();
             return s;
         };
 
@@ -667,10 +680,9 @@ public final class ClothConfigScreenBuilder {
 
         return styleSection(entryBuilder, style,
                 iconEnabledEntry,
-                shadowEnabledEntry,
                 backgroundEnabledEntry,
-                group(entryBuilder, key("group.dyeable"), dyeableEnabledEntry, dyeableColorEntry, dyeableAboveEntry, dyeableOpacityEntry),
-                group(entryBuilder, key("group.static"), staticEnabledEntry, staticAboveEntry, staticOrderEntry, staticOpacityEntry),
+                group(entryBuilder, key("group.dyeable"), dyeableEnabledEntry, dyeableColorEntry, dyeableAboveEntry, dyeableOpacityEntry, dyeableShadowEntry),
+                group(entryBuilder, key("group.static"), staticEnabledEntry, staticAboveEntry, staticOrderEntry, staticOpacityEntry, staticShadowEntry),
                 group(entryBuilder, key("group.background"), backgroundColorEntry, backgroundOpacityEntry));
     }
 

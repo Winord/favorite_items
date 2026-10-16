@@ -433,7 +433,7 @@ public final class FavoriteSlots {
 
         var hotbarFavorite = isFavorite(hotbarIndex);
         var offhandFavorite = isFavorite(OFFHAND_INDEX);
-        if (hotbarFavorite == offhandFavorite && !ToolGuard.anyEnabled()) return;
+        if (hotbarFavorite == offhandFavorite && !ToolGuard.anyEnabled() && !ToolGuard.breakingProtectEnabled()) return;
 
         handSwapChangesFavorites = !isSuspended();
         handSwap.request(hotbarIndex, hotbar.copy(), offhand.copy(), hotbarFavorite, offhandFavorite);

@@ -17,7 +17,10 @@ public final class StyleSettings {
     public int backgroundColor = 0xFFD700;
     public int backgroundOpacityPercent = 40;
 
-    public boolean shadowEnabled = true;
+    public boolean dyeableShadowEnabled = true;
+    public boolean staticShadowEnabled = true;
+
+    private Boolean shadowEnabled;
 
     public StyleSettings copy() {
         var s = new StyleSettings();
@@ -33,7 +36,8 @@ public final class StyleSettings {
         s.backgroundEnabled = backgroundEnabled;
         s.backgroundColor = backgroundColor;
         s.backgroundOpacityPercent = backgroundOpacityPercent;
-        s.shadowEnabled = shadowEnabled;
+        s.dyeableShadowEnabled = dyeableShadowEnabled;
+        s.staticShadowEnabled = staticShadowEnabled;
         return s;
     }
 
@@ -60,6 +64,12 @@ public final class StyleSettings {
     }
 
     public void normalize() {
+        if (shadowEnabled != null) {
+            dyeableShadowEnabled = shadowEnabled;
+            staticShadowEnabled = shadowEnabled;
+            shadowEnabled = null;
+        }
+
         if (showsAnything(iconEnabled, dyeableEnabled, staticEnabled, backgroundEnabled)) return;
 
         iconEnabled = true;
@@ -106,7 +116,8 @@ public final class StyleSettings {
         s.staticAboveDyeable = fixedAboveDyeable;
         s.backgroundColor = backgroundColor;
         s.backgroundOpacityPercent = 20;
-        s.shadowEnabled = shadow;
+        s.dyeableShadowEnabled = shadow;
+        s.staticShadowEnabled = shadow;
         return s;
     }
 }
