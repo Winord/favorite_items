@@ -26,6 +26,7 @@
     "MixinClothEntryLabel",
     "MixinClothListEntryRow",
     "MixinClothListFrame",
-    "MixinClothListRows"
+    "MixinClothListRows",
+    "MixinClothElementEntry"
   ]
 }
