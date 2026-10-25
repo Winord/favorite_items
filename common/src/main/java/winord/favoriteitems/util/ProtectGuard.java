@@ -219,6 +219,8 @@ public final class ProtectGuard {
     }
 
     public static void notifyBlocked(Player player, InteractionHand hand) {
+        if (followsBlockedMainHand(player, hand)) return;
+
         if (lastBlockedAction != null) ActionBarMessages.protectBlocked(lastBlockedAction);
 
         var gui = Minecraft.getInstance().gui;
