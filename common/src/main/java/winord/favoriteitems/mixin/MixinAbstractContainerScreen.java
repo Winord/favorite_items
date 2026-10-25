@@ -2,6 +2,7 @@ package winord.favoriteitems.mixin;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -193,7 +194,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
         var sound = FavoriteItemsSounds.forStyle(FavoriteItemsConfig.soundStyle);
         if (sound != null) {
             float pitch = (nowFavorite ? 1.0f : 0.8f) + minecraft.player.getRandom().nextFloat() * 0.1f;
-            minecraft.player.playSound(sound, 0.4f, pitch);
+            minecraft.getSoundManager().play(SimpleSoundInstance.forUI(sound, pitch, 0.4f));
         }
         return nowFavorite;
     }
@@ -253,7 +254,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
                 && InputConstants.isKeyDown(minecraft.getWindow(), key.getValue());
     }
 
-    @Inject(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;matchesMouse(Lnet/minecraft/client/input/MouseButtonEvent;)Z"), cancellable = true)
+    @Inject(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;getHoveredSlot(DD)Lnet/minecraft/world/inventory/Slot;"), cancellable = true)
     private void favoriteitems$toggleOnKeyClick(MouseButtonEvent event, boolean doubleClick, CallbackInfoReturnable<Boolean> cir) {
         double mouseX = event.x(), mouseY = event.y();
         if (FavoriteSlots.isSuspended() || event.button() != 0) return;
