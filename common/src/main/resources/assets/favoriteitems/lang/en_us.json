@@ -169,7 +169,7 @@
   "config.favoriteitems.brush_protect": "Brushes",
   "config.favoriteitems.brush_protect.tooltip": "No brushing suspicious sand or gravel,\nno brushing scutes off armadillos.",
   "config.favoriteitems.tools_breaking_protect": "Tools Breaking Protection",
-  "config.favoriteitems.tools_breaking_protect.tooltip": "Yes: a tool with 1 durability left can't be used at all:\nno breaking blocks, no hitting, no right-click use.\nCovers every tool, not only the ones above.\nArmor is not covered.",
+  "config.favoriteitems.tools_breaking_protect.tooltip": "Yes: a tool with 2 or less durability left can't be used at all:\nno breaking blocks, no hitting, no right-click use.\nCovers every tool, not only the ones above.\nArmor is not covered.",
   "config.favoriteitems.sorting_compat": "Sorting Mods",
   "config.favoriteitems.move_same_favorites": "Favorites on Move Same Items",
   "config.favoriteitems.move_same_favorites.tooltip": "What the \"Move Same Items\" buttons and keys of Nemo's\nInventory Sorting, Client Sort and Inventory Profiles Next\ndo with favorited stacks.\nStay in Place: favorites are left alone.\nMove, Leave One: stackable favorites move out too, one item\nstaying in the favorite slot. Non-stackable favorites always stay.\nOut of the player a favorite moves only if the container\nalready holds its item. Exceptions: IPN's Move All and Only\nFocused Type ignore that, Just Refill fills existing stacks only.\nInto the player, IPN tops up favorites that have room.\nClient Sort always tops them up, whatever this is set to.",

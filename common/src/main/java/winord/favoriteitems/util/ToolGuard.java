@@ -48,6 +48,8 @@ public final class ToolGuard {
     public static final String SHEARS = "config." + MOD_ID + ".shears_protect";
     public static final String BRUSH = "config." + MOD_ID + ".brush_protect";
 
+    private static final int BREAK_GUARD_REMAINING_DURABILITY = 2;
+
     private static final TagKey<Item> SHEARS_TAG_FABRIC = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "shears"));
     private static final TagKey<Item> SHEARS_TAG_TOOLS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "tools/shear"));
 
@@ -68,7 +70,7 @@ public final class ToolGuard {
 
     public static boolean isOnLastDurability(ItemStack stack) {
         if (stack.isEmpty() || !stack.isDamageableItem()) return false;
-        if (stack.getMaxDamage() - stack.getDamageValue() > 1) return false;
+        if (stack.getMaxDamage() - stack.getDamageValue() > BREAK_GUARD_REMAINING_DURABILITY) return false;
 
         var equippable = stack.get(DataComponents.EQUIPPABLE);
         return equippable == null || !isArmorSlot(equippable.slot());
