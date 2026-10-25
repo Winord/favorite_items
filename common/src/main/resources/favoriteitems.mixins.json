@@ -16,6 +16,7 @@
     "MixinClientPacketListener",
     "MixinClientCommonPacketListenerImpl",
     "MixinMultiPlayerGameMode",
+    "MixinMinecraft",
     "MixinInventory",
     "MixinCreativeModeInventoryScreen",
     "MixinEquipable",

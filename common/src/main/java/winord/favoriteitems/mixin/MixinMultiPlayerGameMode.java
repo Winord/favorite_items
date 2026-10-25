@@ -35,7 +35,7 @@ public abstract class MixinMultiPlayerGameMode {
     {
         if (favoriteitems$holdForHandSwap(cir)) return;
 
-        if (ToolGuard.blocksLastDurabilityUse(player, hand)) {
+        if (ToolGuard.blocksItemUse(player, hand)) {
             cir.setReturnValue(InteractionResult.FAIL);
             return;
         }
@@ -49,7 +49,7 @@ public abstract class MixinMultiPlayerGameMode {
     {
         if (favoriteitems$holdForHandSwap(cir)) return;
 
-        if (ToolGuard.blocksLastDurabilityBlockUse(player, hand, hit)) {
+        if (ToolGuard.blocksBlockUse(player, hand, hit)) {
             cir.setReturnValue(InteractionResult.FAIL);
             return;
         }
@@ -69,7 +69,7 @@ public abstract class MixinMultiPlayerGameMode {
     {
         if (favoriteitems$holdForHandSwap(cir)) return;
 
-        if (ToolGuard.blocksLastDurabilityUse(player, hand)) {
+        if (ToolGuard.blocksEntityUse(player, hand, target)) {
             cir.setReturnValue(InteractionResult.FAIL);
             return;
         }
@@ -85,22 +85,23 @@ public abstract class MixinMultiPlayerGameMode {
 
     @Inject(method = "startDestroyBlock", at = @At("HEAD"), cancellable = true)
     private void favoriteitems$guardStartDestroy(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
-        if (favoriteitems$blocksMainHandBreaking()) cir.setReturnValue(false);
+        if (favoriteitems$blocksBlockBreaking(pos)) cir.setReturnValue(false);
     }
 
     @Inject(method = "continueDestroyBlock", at = @At("HEAD"), cancellable = true)
     private void favoriteitems$guardContinueDestroy(BlockPos pos, Direction direction, CallbackInfoReturnable<Boolean> cir) {
-        if (favoriteitems$blocksMainHandBreaking()) cir.setReturnValue(false);
+        if (favoriteitems$blocksBlockBreaking(pos)) cir.setReturnValue(false);
     }
 
     @Inject(method = "attack", at = @At("HEAD"), cancellable = true)
     private void favoriteitems$guardAttack(Player player, Entity target, CallbackInfo ci) {
-        if (ToolGuard.blocksLastDurabilityUse(player, InteractionHand.MAIN_HAND)) ci.cancel();
+        if (ToolGuard.blocksEntityAttack(player, target)) ci.cancel();
     }
 
     @Inject(method = "piercingAttack", at = @At("HEAD"), cancellable = true)
     private void favoriteitems$guardPiercingAttack(PiercingWeapon weapon, CallbackInfo ci) {
-        if (favoriteitems$blocksMainHandBreaking()) ci.cancel();
+        var player = Minecraft.getInstance().player;
+        if (player != null && ToolGuard.blocksPiercingAttack(player)) ci.cancel();
     }
 
     @Inject(method = "handlePickItemFromBlock", at = @At("HEAD"))
@@ -148,9 +149,9 @@ public abstract class MixinMultiPlayerGameMode {
         }
     }
 
-    private static boolean favoriteitems$blocksMainHandBreaking() {
+    private static boolean favoriteitems$blocksBlockBreaking(BlockPos pos) {
         var player = Minecraft.getInstance().player;
-        return player != null && ToolGuard.blocksLastDurabilityUse(player, InteractionHand.MAIN_HAND);
+        return player != null && ToolGuard.blocksBlockBreaking(player, pos);
     }
 
     private static boolean favoriteitems$holdForHandSwap(CallbackInfoReturnable<InteractionResult> cir) {
