@@ -41,14 +41,23 @@ public final class FavoriteSlots {
     public static final int INVENTORY_SIZE = OFFHAND_INDEX + 1;
     public static final int ENDER_CHEST_OFFSET = 1000;
 
-    private static final Gson GSON = new Gson();
     private static final String LAST_DEATH_KEY = "last_death";
+    private static final int MAX_FILE_NAME_BYTES = 100;
+    private static final int CONTENT_WAIT_TICKS = 40;
+    private static final int MASS_CHANGE_SLOTS = 5;
+    private static final int HAND_SWAP_GUARD_TICKS = 40;
+    private static final int PICK_TIMEOUT_TICKS = 100;
+    private static final int RETURN_TIMEOUT_TICKS = 60;
+    private static final long ENDER_CHEST_SYNC_GRACE_MS = 750;
 
+    private static final Gson GSON = new Gson();
     private static final Path WORLDS_DIR = FavoriteItems.CONFIG_DIR.resolve("worlds");
     private static final Path SERVERS_DIR = FavoriteItems.CONFIG_DIR.resolve("servers");
-    private static final int MAX_FILE_NAME_BYTES = 100;
-
     private static final Item UNLEARNED = Items.AIR;
+
+    private record PendingPick(int from, int to, ItemStack expectedFrom, ItemStack expectedTo, boolean fromFavorite, boolean toFavorite) { }
+
+    private record PendingReturn(ItemStack[] before, ItemStack stack) { }
 
     private static final Map<Integer, Item> favorites = new TreeMap<>();
     private static Path currentFile = null;
@@ -56,30 +65,20 @@ public final class FavoriteSlots {
     private static Item[] lastItems = null;
     private static boolean inventoryReplaced = false;
     private static int awaitingContentTicks = 0;
-    private static final int CONTENT_WAIT_TICKS = 40;
-    private static final int MASS_CHANGE_SLOTS = 5;
+    private static boolean leftCreative = false;
 
     private static final HandSwapTracker<ItemStack> handSwap = new HandSwapTracker<>(ItemStack::matches, OFFHAND_INDEX);
     private static boolean handSwapChangesFavorites = false;
-    private static final int HAND_SWAP_GUARD_TICKS = 40;
 
-    private static boolean leftCreative = false;
-
-    private static final int PICK_TIMEOUT_TICKS = 100;
-    private record PendingPick(int from, int to, ItemStack expectedFrom, ItemStack expectedTo, boolean fromFavorite, boolean toFavorite) { }
     private static PendingPick pendingPick = null;
     private static int pickAge = 0;
 
-    private static final int RETURN_TIMEOUT_TICKS = 60;
-    private record PendingReturn(ItemStack[] before, ItemStack stack) { }
     private static PendingReturn pendingReturn = null;
     private static int returnTicksLeft = 0;
 
     private static int screenClickDepth = 0;
-
     private static final ThreadLocal<Boolean> pickupAllActive = ThreadLocal.withInitial(() -> false);
 
-    private static final long ENDER_CHEST_SYNC_GRACE_MS = 750;
     private static long enderChestOpenedAt = 0L;
 
     private FavoriteSlots() { }

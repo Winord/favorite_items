@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import winord.favoriteitems.util.FavoriteSlots;
 
 @Mixin(Item.class)
-public abstract class MixinEquipable {
+public abstract class MixinItem {
     @Unique
     private boolean favoriteitems$handWasFavorite;
     @Unique

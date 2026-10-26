@@ -67,7 +67,7 @@ public final class DeathFavorites {
     }
 
     private static final ArrayDeque<List<Held>> history = new ArrayDeque<>();
-    private static DeathRecord record = null;
+    private static DeathRecord lastDeath = null;
     private static List<Held> lostFavorites = List.of();
     private static ItemStack[] lastStacks = null;
 
@@ -82,7 +82,7 @@ public final class DeathFavorites {
     static void reset() {
         pause();
         awaitingBaseline = false;
-        record = null;
+        lastDeath = null;
     }
 
     static void suspend() {
@@ -152,9 +152,9 @@ public final class DeathFavorites {
         if (lost == null || lost.isEmpty()) return;
 
         lostFavorites = lost;
-        record = new DeathRecord(player.level().dimension().identifier().toString(), player.position(),
+        lastDeath = new DeathRecord(player.level().dimension().identifier().toString(), player.position(),
                 player.level().getGameTime(), System.currentTimeMillis());
-        for (var held : lost) record.add(held.stack());
+        for (var held : lost) lastDeath.add(held.stack());
         FavoriteSlots.save();
     }
 
@@ -185,13 +185,13 @@ public final class DeathFavorites {
     }
 
     private static void discardRecord() {
-        record = null;
+        lastDeath = null;
         FavoriteSlots.save();
     }
 
     static void collectReturns(Minecraft minecraft, Inventory inventory) {
         var level = minecraft.level;
-        if (record == null || level == null || !FavoriteItemsConfig.deathFavorites) {
+        if (lastDeath == null || level == null || !FavoriteItemsConfig.deathFavorites) {
             lastStacks = null;
             return;
         }
@@ -199,9 +199,9 @@ public final class DeathFavorites {
         boolean expired;
         boolean timeNotReached = false;
         if (usesWallClock(minecraft)) {
-            expired = System.currentTimeMillis() - record.realTime > RETURN_WINDOW_MILLIS;
+            expired = System.currentTimeMillis() - lastDeath.realTime > RETURN_WINDOW_MILLIS;
         } else {
-            long age = level.getGameTime() - record.gameTime;
+            long age = level.getGameTime() - lastDeath.gameTime;
             expired = age > RETURN_WINDOW_TICKS;
             timeNotReached = age < 0;
         }
@@ -231,7 +231,7 @@ public final class DeathFavorites {
         awaitingBaseline = false;
 
         boolean changed = false;
-        for (var iterator = record.items.iterator(); iterator.hasNext(); ) {
+        for (var iterator = lastDeath.items.iterator(); iterator.hasNext(); ) {
             var item = iterator.next();
             int gained = total(current, item.template) - total(previous, item.template);
             if (gained <= 0) continue;
@@ -246,23 +246,23 @@ public final class DeathFavorites {
         }
         if (!changed) return;
 
-        if (record.items.isEmpty()) record = null;
+        if (lastDeath.items.isEmpty()) lastDeath = null;
         FavoriteSlots.save();
     }
 
     static JsonObject toJson() {
-        if (record == null) return null;
+        if (lastDeath == null) return null;
 
         var json = new JsonObject();
-        json.addProperty("dimension", record.dimension);
-        json.addProperty("x", record.pos.x);
-        json.addProperty("y", record.pos.y);
-        json.addProperty("z", record.pos.z);
-        json.addProperty("time", record.gameTime);
-        json.addProperty("real_time", record.realTime);
+        json.addProperty("dimension", lastDeath.dimension);
+        json.addProperty("x", lastDeath.pos.x);
+        json.addProperty("y", lastDeath.pos.y);
+        json.addProperty("z", lastDeath.pos.z);
+        json.addProperty("time", lastDeath.gameTime);
+        json.addProperty("real_time", lastDeath.realTime);
 
         var items = new JsonArray();
-        for (var item : record.items) {
+        for (var item : lastDeath.items) {
             var entry = new JsonObject();
             var encoded = ItemStack.CODEC.encodeStart(registries().createSerializationContext(NbtOps.INSTANCE), item.template).result();
             if (encoded.isEmpty()) continue;
@@ -275,7 +275,7 @@ public final class DeathFavorites {
     }
 
     static void load(JsonObject json) {
-        record = null;
+        lastDeath = null;
         try {
             var loaded = new DeathRecord(
                     json.get("dimension").getAsString(),
@@ -292,7 +292,7 @@ public final class DeathFavorites {
                 stack.setCount(count);
                 loaded.add(stack);
             }
-            if (!loaded.items.isEmpty()) record = loaded;
+            if (!loaded.items.isEmpty()) lastDeath = loaded;
         } catch (CommandSyntaxException | RuntimeException e) {
             FavoriteItems.LOGGER.warn("Ignoring an unreadable last_death record.", e);
         }
@@ -311,8 +311,8 @@ public final class DeathFavorites {
     private static boolean isNearDeathSite(Minecraft minecraft) {
         var player = minecraft.player;
         return player != null
-                && player.level().dimension().identifier().toString().equals(record.dimension)
-                && player.position().distanceToSqr(record.pos) <= RETURN_RADIUS * RETURN_RADIUS;
+                && player.level().dimension().identifier().toString().equals(lastDeath.dimension)
+                && player.position().distanceToSqr(lastDeath.pos) <= RETURN_RADIUS * RETURN_RADIUS;
     }
 
     private static boolean isPickupSlot(int index) {

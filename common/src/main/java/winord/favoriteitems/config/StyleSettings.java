@@ -20,8 +20,6 @@ public final class StyleSettings {
     public boolean dyeableShadowEnabled = true;
     public boolean staticShadowEnabled = true;
 
-    private Boolean shadowEnabled;
-
     public StyleSettings copy() {
         var s = new StyleSettings();
         s.iconEnabled = iconEnabled;
@@ -64,12 +62,6 @@ public final class StyleSettings {
     }
 
     public void normalize() {
-        if (shadowEnabled != null) {
-            dyeableShadowEnabled = shadowEnabled;
-            staticShadowEnabled = shadowEnabled;
-            shadowEnabled = null;
-        }
-
         if (showsAnything(iconEnabled, dyeableEnabled, staticEnabled, backgroundEnabled)) return;
 
         iconEnabled = true;

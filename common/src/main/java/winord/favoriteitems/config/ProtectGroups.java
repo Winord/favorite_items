@@ -24,7 +24,7 @@ public final class ProtectGroups {
     public static final String ALL = "all";
     public static final String PREFIX = "@";
 
-    private static final int FORMAT_VERSION = 1;
+    private static final int FORMAT_VERSION = 2;
     private static final Pattern NAME = Pattern.compile("[a-z0-9_.-]+");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path DIR = FavoriteItems.CONFIG_DIR.resolve("presets").resolve("groups");

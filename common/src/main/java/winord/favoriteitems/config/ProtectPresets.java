@@ -36,7 +36,7 @@ public final class ProtectPresets {
 
     private static final List<String> BUILTIN_IDS = List.of(BUILD_ID, SOFT_ID, FULL_ID, CUSTOM_ID);
     private static final int MAX_NAME_LENGTH = 32;
-    private static final int FORMAT_VERSION = 1;
+    private static final int FORMAT_VERSION = 2;
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path DIR = FavoriteItems.CONFIG_DIR.resolve("presets");

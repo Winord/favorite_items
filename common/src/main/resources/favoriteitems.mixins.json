@@ -19,7 +19,7 @@
     "MixinMinecraft",
     "MixinInventory",
     "MixinCreativeModeInventoryScreen",
-    "MixinEquipable",
+    "MixinItem",
     "MixinAbstractContainerScreen",
     "MixinAbstractContainerMenu",
     "MixinSlot",

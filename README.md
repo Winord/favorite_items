@@ -24,6 +24,8 @@ to favorite or unfavorite it. Favorited stacks get an icon (a star by default; t
 - **Additional Protection** (off by default): optionally stops a favorited item in your hand from being *used* (placing
   blocks, eating, throwing, using on entities or blocks, ...), per action and per preset, with include/exclude lists.
 - **Tool protection**: optional toggles that stop axes, shovels, hoes, shears and brushes from doing their special action.
+- **Tools Breaking Protection**: optional, independent of favorites; stops any damageable tool, weapon or shield from
+  being used when the action would break it, leaving it with 1 durability.
 - **Optional (Extra tab):** keep favorites on servers with a lobby (off by default), and keep favorites after death
   (off by default): items you pick up near where you died get their favorite back, as many as you lost.
 - **Ender Chest support**: Ender Chest slots can be favorited as well.
@@ -39,8 +41,8 @@ remembers its item, so on servers with a lobby the favorites stay dormant there 
 Favorited slots are left alone by these sorting mods (each integration only activates when the mod is installed):
 - [Inventory Sorting](https://modrinth.com/mod/inventory-sorting)
 - [ClientSort](https://modrinth.com/mod/clientsort)
-- Nemo's Inventory Sorting: sort, move-all, move-same and drop-all buttons, on the 1.8.x builds as well as the newer
-  builds that have their own slot locking.
+- Nemo's Inventory Sorting 1.18: sort, move-all, move-same and drop-all buttons. Its own slot locks are switched off
+  while Favorite Items is installed, since they share the `Left Alt` key with favoriting.
 - Inventory Profiles Next: sorting, move-all, scrolling and slot locks leave favorites alone, and auto refill can skip
   them or top up a favorited stack whose last item is protected.
 - Litematica: Easy Place and Pick Block skip a favorited stack that Additional Protection guards.

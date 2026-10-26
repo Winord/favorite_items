@@ -45,6 +45,9 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
     @Unique private static final int NONE = -1;
     @Unique private static final int QUICK_CRAFT_START = 0;
     @Unique private static final int QUICK_CRAFT_ADD = 1;
+    @Unique private static final int KEY_DRAG_NONE = 0;
+    @Unique private static final int KEY_DRAG_FAVORITE = 1;
+    @Unique private static final int KEY_DRAG_UNFAVORITE = -1;
 
     @Shadow @Final protected T menu;
     @Shadow @Final protected Set<Slot> quickCraftSlots;
@@ -60,7 +63,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
     @Unique private boolean favoriteitems$dragTouchedMultiple = false;
     @Unique private boolean favoriteitems$dragBlocked = false;
 
-    @Unique private int favoriteitems$keyDragMode = 0;
+    @Unique private int favoriteitems$keyDragMode = KEY_DRAG_NONE;
     @Unique private double favoriteitems$keyDragX;
     @Unique private double favoriteitems$keyDragY;
 
@@ -141,10 +144,10 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
 
     @Unique
     private boolean favoriteitems$wouldEquipArmor(Slot slot) {
-        if (!(menu instanceof InventoryMenu) || slot.index < 9 || slot.index > 44) return false;
+        if (!(menu instanceof InventoryMenu) || slot.index < InventoryMenu.INV_SLOT_START || slot.index >= InventoryMenu.USE_ROW_SLOT_END) return false;
 
         var equipmentSlot = minecraft.player.getEquipmentSlotForItem(slot.getItem());
-        return equipmentSlot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR && !menu.getSlot(8 - equipmentSlot.getIndex()).hasItem();
+        return equipmentSlot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR && !menu.getSlot(InventoryMenu.ARMOR_SLOT_END - 1 - equipmentSlot.getIndex()).hasItem();
     }
 
     @Unique
@@ -265,7 +268,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
         var index = favoriteitems$indexOf(slot);
         if (index < 0) return;
 
-        favoriteitems$keyDragMode = favoriteitems$toggleFavorite(index) ? 1 : -1;
+        favoriteitems$keyDragMode = favoriteitems$toggleFavorite(index) ? KEY_DRAG_FAVORITE : KEY_DRAG_UNFAVORITE;
         favoriteitems$keyDragX = mouseX;
         favoriteitems$keyDragY = mouseY;
         cir.setReturnValue(true);
@@ -273,11 +276,11 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
 
     @Inject(method = "mouseDragged", at = @At("HEAD"))
     private void favoriteitems$dragToggle(MouseButtonEvent event, double deltaX, double deltaY, CallbackInfoReturnable<Boolean> cir) {
-        if (favoriteitems$keyDragMode == 0) return;
+        if (favoriteitems$keyDragMode == KEY_DRAG_NONE) return;
 
         double mouseX = event.x(), mouseY = event.y();
         if (event.button() != 0 || FavoriteSlots.isSuspended() || !menu.getCarried().isEmpty() || !favoriteitems$isFavoriteKeyDown()) {
-            favoriteitems$keyDragMode = 0;
+            favoriteitems$keyDragMode = KEY_DRAG_NONE;
             return;
         }
 
@@ -294,7 +297,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
 
     @Inject(method = "mouseReleased", at = @At("HEAD"))
     private void favoriteitems$endKeyDrag(MouseButtonEvent event, CallbackInfoReturnable<Boolean> cir) {
-        if (event.button() == 0) favoriteitems$keyDragMode = 0;
+        if (event.button() == 0) favoriteitems$keyDragMode = KEY_DRAG_NONE;
     }
 
     @Unique
@@ -305,7 +308,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
         if (index < 0) return;
 
         var favorite = FavoriteSlots.isFavorite(index);
-        boolean needsChange = favoriteitems$keyDragMode > 0 ? !favorite && slot.hasItem() : favorite;
+        boolean needsChange = favoriteitems$keyDragMode == KEY_DRAG_FAVORITE ? !favorite && slot.hasItem() : favorite;
         if (needsChange) favoriteitems$toggleFavorite(index);
     }
 

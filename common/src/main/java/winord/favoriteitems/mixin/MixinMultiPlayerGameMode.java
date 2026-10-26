@@ -16,6 +16,7 @@ import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -121,6 +122,7 @@ public abstract class MixinMultiPlayerGameMode {
         if (player != null) favoriteitems$trackPick(player, entity.getPickResult());
     }
 
+    @Unique
     private static void favoriteitems$trackPick(LocalPlayer player, ItemStack picked) {
         if (picked == null || picked.isEmpty()) return;
 
@@ -149,11 +151,13 @@ public abstract class MixinMultiPlayerGameMode {
         }
     }
 
+    @Unique
     private static boolean favoriteitems$blocksBlockBreaking(BlockPos pos) {
         var player = Minecraft.getInstance().player;
         return player != null && ToolGuard.blocksBlockBreaking(player, pos);
     }
 
+    @Unique
     private static boolean favoriteitems$holdForHandSwap(CallbackInfoReturnable<InteractionResult> cir) {
         if (!FavoriteSlots.isHandSwapInFlight()) return false;
 
@@ -161,6 +165,7 @@ public abstract class MixinMultiPlayerGameMode {
         return true;
     }
 
+    @Unique
     private static void favoriteitems$failProtected(
             Player player, InteractionHand hand, CallbackInfoReturnable<InteractionResult> cir)
     {
@@ -168,6 +173,7 @@ public abstract class MixinMultiPlayerGameMode {
         cir.setReturnValue(InteractionResult.FAIL);
     }
 
+    @Unique
     private static void favoriteitems$failTool(String toggleLabelKey, CallbackInfoReturnable<InteractionResult> cir) {
         ActionBarMessages.toolBlocked(toggleLabelKey);
         cir.setReturnValue(InteractionResult.FAIL);
