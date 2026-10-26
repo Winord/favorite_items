@@ -8,9 +8,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import winord.favoriteitems.compat.nemosinventorysorting.NemoReflect;
+import winord.favoriteitems.compat.nemosinventorysorting.NemoSortPlan;
 import winord.favoriteitems.util.FavoriteSlots;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,23 +27,11 @@ public abstract class MixinSortingService {
     }
 
     @Inject(method = "retrieveSlotSwapMap", at = @At("HEAD"), cancellable = true, require = 0, remap = false)
-    private void favoriteitems$assignAroundFavorites(List<Object> slotItems, int startIndex,
+    private void favoriteitems$assignAroundFavorites(List<Object> slotItems, int startIndex, int endIndex,
                                                      CallbackInfoReturnable<Map<Integer, Integer>> cir) {
         var player = Minecraft.getInstance().player;
         if (player == null) return;
 
-        var menu = player.containerMenu;
-        var result = new LinkedHashMap<Integer, Integer>();
-
-        int destination = startIndex;
-        for (var item : slotItems) {
-            while (FavoriteSlots.isFavorite(menu, destination)) destination++;
-
-            int current = NemoReflect.slotIndexOf(item);
-            if (current != destination) result.put(current, destination);
-            destination++;
-        }
-
-        cir.setReturnValue(result);
+        cir.setReturnValue(NemoSortPlan.swapMap(player.containerMenu, slotItems, startIndex, endIndex));
     }
 }

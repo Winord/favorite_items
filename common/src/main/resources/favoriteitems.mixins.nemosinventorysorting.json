@@ -9,6 +9,10 @@
   "mixins": [
     "MixinAbstractSingleClickButton",
     "MixinMoveSameButton",
-    "MixinSortingService"
+    "MixinSortingService",
+    "MixinLockedSlotsConfig",
+    "MixinLockedSlotService",
+    "MixinConfigService",
+    "MixinNemoAltInput"
   ]
 }
