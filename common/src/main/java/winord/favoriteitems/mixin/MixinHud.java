@@ -2,7 +2,7 @@ package winord.favoriteitems.mixin;
 
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.Hud;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
@@ -15,12 +15,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import winord.favoriteitems.config.FavoriteItemsConfig;
 import winord.favoriteitems.config.HotbarIndicatorMode;
-import winord.favoriteitems.extension.ExtensionGui;
+import winord.favoriteitems.extension.ExtensionHud;
 import winord.favoriteitems.util.FavoriteSlots;
 import winord.favoriteitems.util.RenderUtil;
 
-@Mixin(Gui.class)
-public abstract class MixinGui implements ExtensionGui {
+@Mixin(Hud.class)
+public abstract class MixinHud implements ExtensionHud {
     @Unique private static final int FLASH_TICKS = 10;
     @Unique private static final float FLASH_FADE_DIVISOR = 5f;
 

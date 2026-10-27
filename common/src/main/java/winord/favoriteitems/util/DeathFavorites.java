@@ -224,7 +224,7 @@ public final class DeathFavorites {
             awaitingBaseline = false;
             return;
         }
-        if (minecraft.screen instanceof AbstractContainerScreen<?>) {
+        if (minecraft.gui.screen() instanceof AbstractContainerScreen<?>) {
             if (usesBaseline) lastStacks = null;
             return;
         }

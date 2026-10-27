@@ -203,7 +203,7 @@ public final class FavoriteSlots {
     public static int resolveIndex(Container container, int slotInContainer) {
         if (container instanceof Inventory) return slotInContainer;
 
-        return Minecraft.getInstance().screen instanceof AbstractContainerScreen<?> screen
+        return Minecraft.getInstance().gui.screen() instanceof AbstractContainerScreen<?> screen
                 && isEnderChestTitle(screen.getTitle())
                 ? enderChestIndex(slotInContainer)
                 : -1;
@@ -547,7 +547,7 @@ public final class FavoriteSlots {
     private static void pruneEmptiedEnderChest() {
         if (favorites.isEmpty()) return;
         if (System.currentTimeMillis() - enderChestOpenedAt < ENDER_CHEST_SYNC_GRACE_MS) return;
-        if (!(Minecraft.getInstance().screen instanceof AbstractContainerScreen<?> screen)) return;
+        if (!(Minecraft.getInstance().gui.screen() instanceof AbstractContainerScreen<?> screen)) return;
         if (!isEnderChestTitle(screen.getTitle())) return;
 
         var emptied = new ArrayList<Integer>();

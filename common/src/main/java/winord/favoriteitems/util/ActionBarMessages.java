@@ -39,6 +39,6 @@ public final class ActionBarMessages {
         if (!FavoriteItemsConfig.actionBarNotifications) return;
 
         var gui = Minecraft.getInstance().gui;
-        if (gui != null) gui.setOverlayMessage(message, false);
+        if (gui != null) gui.hud.setOverlayMessage(message, false);
     }
 }

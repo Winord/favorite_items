@@ -175,7 +175,7 @@ public final class IpnCompat {
 
         var minecraft = Minecraft.getInstance();
         var player = minecraft.player;
-        if (player == null || minecraft.screen != null) return true;
+        if (player == null || minecraft.gui.screen() != null) return true;
 
         var menu = player.inventoryMenu;
         if (sourceMenuSlot < 0 || sourceMenuSlot >= menu.slots.size() || sourceMenuSlot == topUpMenuSlot) return true;
@@ -207,7 +207,7 @@ public final class IpnCompat {
 
     public static void leaveOneBeforeMove(boolean toPlayer) {
         if (!MoveSameFavorites.leavesOne() || !isLoaded() || !prepareMoveSettings()) return;
-        if (!(Minecraft.getInstance().screen instanceof AbstractContainerScreen<?> screen)) return;
+        if (!(Minecraft.getInstance().gui.screen() instanceof AbstractContainerScreen<?> screen)) return;
 
         var menu = screen.getMenu();
         try {
@@ -258,7 +258,7 @@ public final class IpnCompat {
     public static List<Integer> withoutEnderChestFavorites(List<Integer> slotNumbers) {
         if (refillSearchDepth > 0 || slotNumbers.isEmpty() || !FavoriteSlots.hasEnderChestFavorites()) return slotNumbers;
 
-        if (!(Minecraft.getInstance().screen instanceof AbstractContainerScreen<?> screen)
+        if (!(Minecraft.getInstance().gui.screen() instanceof AbstractContainerScreen<?> screen)
                 || !FavoriteSlots.isEnderChestTitle(screen.getTitle())) return slotNumbers;
 
         var menu = screen.getMenu();
@@ -356,12 +356,12 @@ public final class IpnCompat {
     }
 
     public static boolean blocksWheelMove() {
-        return Minecraft.getInstance().screen instanceof ExtensionContainerScreen screen
+        return Minecraft.getInstance().gui.screen() instanceof ExtensionContainerScreen screen
                 && screen.favoriteitems$blocksWheelMove();
     }
 
     public static void trackCursorFavoriteReturn() {
-        if (Minecraft.getInstance().screen instanceof ExtensionContainerScreen screen) {
+        if (Minecraft.getInstance().gui.screen() instanceof ExtensionContainerScreen screen) {
             screen.favoriteitems$trackCursorFavoriteReturn();
         }
     }
@@ -460,7 +460,7 @@ public final class IpnCompat {
             if (!isLoaded() || !prepareHandler()) return null;
 
             var minecraft = Minecraft.getInstance();
-            if (minecraft.player == null || !(minecraft.screen instanceof ExtensionContainerScreen screen)) return null;
+            if (minecraft.player == null || !(minecraft.gui.screen() instanceof ExtensionContainerScreen screen)) return null;
 
             try {
                 var stored = (Set<Integer>) storedLocks.invoke(lockHandler);

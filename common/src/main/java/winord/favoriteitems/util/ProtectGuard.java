@@ -21,7 +21,7 @@ import winord.favoriteitems.config.ProtectAction;
 import winord.favoriteitems.config.ProtectLevel;
 import winord.favoriteitems.config.ProtectPresets;
 import winord.favoriteitems.config.ProtectSubject;
-import winord.favoriteitems.extension.ExtensionGui;
+import winord.favoriteitems.extension.ExtensionHud;
 
 import java.util.function.Supplier;
 
@@ -74,7 +74,7 @@ public final class ProtectGuard {
             return FavoriteSlots.isFavorite(button);
         }
 
-        if (from < FavoriteSlots.ARMOR_START_INDEX && Minecraft.getInstance().screen == null
+        if (from < FavoriteSlots.ARMOR_START_INDEX && Minecraft.getInstance().gui.screen() == null
                 && isTargeted(from) && isActive(player) && protectsPlacing(slot.getItem())) {
             ActionBarMessages.protectBlocked(ProtectAction.PLACE_BLOCK);
             return true;
@@ -111,7 +111,7 @@ public final class ProtectGuard {
     }
 
     public static int usableSwapSource(Player player, int containerId, int slotId) {
-        if (FavoriteSlots.isScreenClickActive() || Minecraft.getInstance().screen != null) return -1;
+        if (FavoriteSlots.isScreenClickActive() || Minecraft.getInstance().gui.screen() != null) return -1;
 
         var menu = ExternalClickGuard.menuOf(player, containerId);
         if (menu == null || slotId < 0 || slotId >= menu.slots.size()) return -1;
@@ -125,7 +125,7 @@ public final class ProtectGuard {
     }
 
     public static boolean swapUsableStackIntoHand(Player player, ItemStack wanted) {
-        if (wanted.isEmpty() || FavoriteSlots.isScreenClickActive() || Minecraft.getInstance().screen != null) return false;
+        if (wanted.isEmpty() || FavoriteSlots.isScreenClickActive() || Minecraft.getInstance().gui.screen() != null) return false;
 
         var inventory = player.getInventory();
         int selected = inventory.getSelectedSlot();
@@ -226,9 +226,9 @@ public final class ProtectGuard {
         var gui = Minecraft.getInstance().gui;
         if (hand == InteractionHand.MAIN_HAND) {
             mainHandBlockedTick = player.tickCount;
-            ExtensionGui.flashIcon(gui);
+            ExtensionHud.flashIcon(gui);
         } else {
-            ExtensionGui.flashIcon(gui, FavoriteSlots.OFFHAND_INDEX);
+            ExtensionHud.flashIcon(gui, FavoriteSlots.OFFHAND_INDEX);
         }
     }
 }

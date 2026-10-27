@@ -30,9 +30,9 @@ public final class MissingClothScreen extends Screen {
         addRenderableWidget(message);
 
         addRenderableWidget(Button.builder(Component.translatable("config." + MOD_ID + ".missing_cloth.modrinth"),
-                        b -> minecraft.setScreen(new ConfirmLinkScreen(confirmed -> {
+                        b -> minecraft.gui.setScreen(new ConfirmLinkScreen(confirmed -> {
                             if (confirmed) Util.getPlatform().openUri(CLOTH_CONFIG_URL);
-                            minecraft.setScreen(this);
+                            minecraft.gui.setScreen(this);
                         }, CLOTH_CONFIG_URL, true)))
                 .pos(width / 2 - 115, height / 2 - 10)
                 .size(230, 20)
@@ -46,6 +46,6 @@ public final class MissingClothScreen extends Screen {
 
     @Override
     public void onClose() {
-        minecraft.setScreen(parent);
+        minecraft.gui.setScreen(parent);
     }
 }

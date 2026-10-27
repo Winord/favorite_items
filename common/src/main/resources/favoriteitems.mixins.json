@@ -23,7 +23,7 @@
     "MixinAbstractContainerScreen",
     "MixinAbstractContainerMenu",
     "MixinSlot",
-    "MixinGui",
+    "MixinHud",
     "MixinClothEntryLabel",
     "MixinClothListEntryRow",
     "MixinClothListFrame",

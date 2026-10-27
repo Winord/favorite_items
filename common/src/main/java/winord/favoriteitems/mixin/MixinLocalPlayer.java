@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import winord.favoriteitems.config.FavoriteItemsConfig;
-import winord.favoriteitems.extension.ExtensionGui;
+import winord.favoriteitems.extension.ExtensionHud;
 import winord.favoriteitems.util.ActionBarMessages;
 import winord.favoriteitems.util.FavoriteSlots;
 import winord.favoriteitems.util.SlotClicks;
@@ -36,7 +36,7 @@ public abstract class MixinLocalPlayer extends Player {
             return;
         }
 
-        ExtensionGui.flashIcon(Minecraft.getInstance().gui);
+        ExtensionHud.flashIcon(Minecraft.getInstance().gui);
         ActionBarMessages.dropBlocked();
         cir.setReturnValue(false);
     }

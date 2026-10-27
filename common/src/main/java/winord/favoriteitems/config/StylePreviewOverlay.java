@@ -143,7 +143,7 @@ public final class StylePreviewOverlay {
         if (!panelActive || mouseX < panelLeft) return mouseX;
 
         var ours = screen.get();
-        if (ours == null || Minecraft.getInstance().screen != ours) return mouseX;
+        if (ours == null || Minecraft.getInstance().gui.screen() != ours) return mouseX;
 
         var list = listAccess.get();
         return list != null && list.owns(widget) ? -1 : mouseX;
@@ -187,7 +187,7 @@ public final class StylePreviewOverlay {
 
     public static void paintListFrame(Object widget, GuiGraphicsExtractor graphics, int mouseY) {
         var ours = screen.get();
-        if (ours == null || Minecraft.getInstance().screen != ours || !panelActive) return;
+        if (ours == null || Minecraft.getInstance().gui.screen() != ours || !panelActive) return;
 
         var list = listAccess.get();
         if (list == null || !list.owns(widget)) return;
@@ -198,7 +198,7 @@ public final class StylePreviewOverlay {
 
     public static void beginRowsClip(Object widget, GuiGraphicsExtractor graphics) {
         var ours = screen.get();
-        if (ours == null || Minecraft.getInstance().screen != ours || !panelActive) return;
+        if (ours == null || Minecraft.getInstance().gui.screen() != ours || !panelActive) return;
 
         var list = listAccess.get();
         if (list == null || !list.owns(widget)) return;
@@ -216,7 +216,7 @@ public final class StylePreviewOverlay {
 
     public static Component fitLabel(Object entry, Component label) {
         var ours = screen.get();
-        if (ours == null || Minecraft.getInstance().screen != ours) return label;
+        if (ours == null || Minecraft.getInstance().gui.screen() != ours) return label;
 
         var list = listAccess.get();
         if (list == null) return label;

@@ -8,7 +8,7 @@ pluginManagement {
 }
 
 if (JavaVersion.current().ordinal() + 1 < 25) {
-    throw new IllegalStateException("Please run Gradle with Java 25+ (Minecraft 26.1 requires it).")
+    throw new IllegalStateException("Please run Gradle with Java 25+ (Minecraft 26.2 requires it).")
 }
 
 rootProject.name = "favoriteitems"

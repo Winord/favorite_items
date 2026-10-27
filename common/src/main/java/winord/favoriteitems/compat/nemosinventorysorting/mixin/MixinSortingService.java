@@ -26,7 +26,7 @@ public abstract class MixinSortingService {
         cir.setReturnValue(filtered);
     }
 
-    @Inject(method = "retrieveSlotSwapMap", at = @At("HEAD"), cancellable = true, require = 0, remap = false)
+    @Inject(method = "retrieveSlotSwaps", at = @At("HEAD"), cancellable = true, require = 0, remap = false)
     private void favoriteitems$assignAroundFavorites(List<Object> slotItems, int startIndex, int endIndex,
                                                      CallbackInfoReturnable<Map<Integer, Integer>> cir) {
         var player = Minecraft.getInstance().player;

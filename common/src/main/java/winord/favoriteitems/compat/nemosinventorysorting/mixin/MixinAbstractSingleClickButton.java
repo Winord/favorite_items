@@ -15,7 +15,7 @@ import java.util.List;
 public abstract class MixinAbstractSingleClickButton {
     @ModifyVariable(method = "triggerClickForAllItems", at = @At("HEAD"), argsOnly = true, require = 0, remap = false)
     private List<Integer> favoriteitems$skipFavoriteSlots(List<Integer> slotIndices) {
-        if (!(Minecraft.getInstance().screen instanceof AbstractContainerScreen<?> screen)) return slotIndices;
+        if (!(Minecraft.getInstance().gui.screen() instanceof AbstractContainerScreen<?> screen)) return slotIndices;
 
         var menu = screen.getMenu();
 

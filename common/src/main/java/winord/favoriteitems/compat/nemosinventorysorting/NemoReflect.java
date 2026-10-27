@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 
 public final class NemoReflect {
     private static Field startIndexField;
-    private static Field endIndexField;
+    private static Method endIndexMethod;
     private static Method slotIndexMethod;
 
     private NemoReflect() { }
@@ -24,13 +24,13 @@ public final class NemoReflect {
 
     public static int endIndexOf(Object button) {
         try {
-            if (endIndexField == null) {
-                endIndexField = findField(button.getClass(), "currentEndIndex");
-                endIndexField.setAccessible(true);
+            if (endIndexMethod == null) {
+                endIndexMethod = findMethod(button.getClass(), "getEndIndex");
+                endIndexMethod.setAccessible(true);
             }
-            return (Integer) endIndexField.get(button);
+            return (Integer) endIndexMethod.invoke(button);
         } catch (ReflectiveOperationException e) {
-            throw new IllegalStateException("Nemo's Inventory Sorting compat: cannot read currentEndIndex", e);
+            throw new IllegalStateException("Nemo's Inventory Sorting compat: cannot read getEndIndex", e);
         }
     }
 
@@ -53,5 +53,15 @@ public final class NemoReflect {
             }
         }
         throw new NoSuchFieldException(name);
+    }
+
+    private static Method findMethod(Class<?> type, String name) throws NoSuchMethodException {
+        for (; type != null; type = type.getSuperclass()) {
+            try {
+                return type.getDeclaredMethod(name);
+            } catch (NoSuchMethodException ignored) {
+            }
+        }
+        throw new NoSuchMethodException(name);
     }
 }
