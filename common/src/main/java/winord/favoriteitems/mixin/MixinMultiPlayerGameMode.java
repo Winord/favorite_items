@@ -12,6 +12,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.PiercingWeapon;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -22,10 +23,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import winord.favoriteitems.compat.litematica.LitematicaCompat;
+import winord.favoriteitems.config.FavoriteItemsConfig;
+import winord.favoriteitems.extension.ExtensionHud;
 import winord.favoriteitems.util.ActionBarMessages;
 import winord.favoriteitems.util.ExternalClickGuard;
 import winord.favoriteitems.util.FavoriteSlots;
 import winord.favoriteitems.util.ProtectGuard;
+import winord.favoriteitems.util.SlotClicks;
 import winord.favoriteitems.util.ToolGuard;
 
 @Mixin(MultiPlayerGameMode.class)
@@ -100,9 +104,35 @@ public abstract class MixinMultiPlayerGameMode {
     }
 
     @Inject(method = "piercingAttack", at = @At("HEAD"), cancellable = true)
-    private void favoriteitems$guardPiercingAttack(PiercingWeapon weapon, CallbackInfo ci) {
+    private void favoriteitems$guardPiercingAttack(SwingAnimation animation, PiercingWeapon weapon, CallbackInfo ci) {
         var player = Minecraft.getInstance().player;
         if (player != null && ToolGuard.blocksPiercingAttack(player)) ci.cancel();
+    }
+
+    @Inject(method = "dropItem", at = @At("HEAD"), cancellable = true)
+    private void favoriteitems$blockFavoriteDrop(LocalPlayer player, boolean entireStack, CallbackInfo ci) {
+        if (FavoriteSlots.isHandSwapInFlight()) {
+            ci.cancel();
+            return;
+        }
+
+        var selected = player.getInventory().getSelectedSlot();
+        if (!FavoriteSlots.isFavorite(selected)) return;
+
+        var stack = player.getInventory().getItem(selected);
+        var mode = FavoriteItemsConfig.dropFavorites;
+        if (!mode.blocks(stack, entireStack ? stack.getCount() : 1)) return;
+
+        var menu = player.inventoryMenu;
+        if (entireStack && mode.keepsLastItemOnDropAll(stack) && SlotClicks.throwAllButOne(menu, FavoriteSlots.menuSlotOf(menu, selected))) {
+            player.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
+            ci.cancel();
+            return;
+        }
+
+        ExtensionHud.flashIcon(Minecraft.getInstance().gui);
+        ActionBarMessages.dropBlocked();
+        ci.cancel();
     }
 
     @Inject(method = "handlePickItemFromBlock", at = @At("HEAD"))

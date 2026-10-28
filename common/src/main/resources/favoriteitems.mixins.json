@@ -8,11 +8,7 @@
   },
   "client": [
     "KeyMappingAccessor",
-    "AxeItemAccessor",
-    "ShovelItemAccessor",
-    "HoeItemAccessor",
     "BrushItemAccessor",
-    "MixinLocalPlayer",
     "MixinClientPacketListener",
     "MixinClientCommonPacketListenerImpl",
     "MixinMultiPlayerGameMode",

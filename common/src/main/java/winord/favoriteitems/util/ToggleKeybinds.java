@@ -28,7 +28,7 @@ public final class ToggleKeybinds {
     private ToggleKeybinds() { }
 
     private static Toggle toggle(String name, BooleanSupplier get, Consumer<Boolean> set) {
-        var key = new KeyMapping("key." + MOD_ID + "." + name, InputConstants.Type.KEYSYM, InputConstants.UNKNOWN.getValue(), CATEGORY);
+        var key = new KeyMapping("key." + MOD_ID + "." + name, InputConstants.Type.KEYBOARD, InputConstants.UNKNOWN.getValue(), CATEGORY);
         return new Toggle(key, "message." + MOD_ID + ".label." + name, get, set);
     }
 

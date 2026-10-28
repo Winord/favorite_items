@@ -238,13 +238,13 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
         return hoveredSlot;
     }
 
-    @Inject(method = "slotClicked", at = @At(value = "INVOKE",
+    @Inject(method = "slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ContainerInput;)V", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;handleContainerInput(IIILnet/minecraft/world/inventory/ContainerInput;Lnet/minecraft/world/entity/player/Player;)V"))
     private void favoriteitems$markScreenClickStart(Slot slot, int slotId, int button, ContainerInput clickType, CallbackInfo ci) {
         FavoriteSlots.enterScreenClick();
     }
 
-    @Inject(method = "slotClicked", at = @At(value = "INVOKE", shift = At.Shift.AFTER,
+    @Inject(method = "slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ContainerInput;)V", at = @At(value = "INVOKE", shift = At.Shift.AFTER,
             target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;handleContainerInput(IIILnet/minecraft/world/inventory/ContainerInput;Lnet/minecraft/world/entity/player/Player;)V"))
     private void favoriteitems$markScreenClickEnd(Slot slot, int slotId, int button, ContainerInput clickType, CallbackInfo ci) {
         FavoriteSlots.exitScreenClick();
@@ -253,8 +253,8 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
     @Unique
     private boolean favoriteitems$isFavoriteKeyDown() {
         var key = ((KeyMappingAccessor) (Object) FavoriteItemsClient.FAVORITE_KEY).favoriteitems$getKey();
-        return key.getType() == InputConstants.Type.KEYSYM
-                && InputConstants.isKeyDown(minecraft.getWindow(), key.getValue());
+        return key.getType() == InputConstants.Type.KEYBOARD
+                && InputConstants.isKeyDown(key.getValue());
     }
 
     @Inject(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;getHoveredSlot(DD)Lnet/minecraft/world/inventory/Slot;"), cancellable = true)
@@ -350,7 +350,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
         return favoriteitems$isCursorFavorite() && !FavoriteSlots.isSuspended() && FavoriteItemsConfig.activeSettings().iconEnabled;
     }
 
-    @Inject(method = "slotClicked", at = @At("TAIL"))
+    @Inject(method = "slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ContainerInput;)V", at = @At("TAIL"))
     private void favoriteitems$followQuickMove(Slot slot, int slotId, int button, ContainerInput clickType, CallbackInfo ci) {
         if (favoriteitems$quickMoveOrigin == NONE) return;
 
@@ -384,7 +384,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
         }
     }
 
-    @Inject(method = "slotClicked", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ContainerInput;)V", at = @At("HEAD"), cancellable = true)
     protected void applyFavoriteRules(
             Slot slot, int slotId, int button, ContainerInput clickType, CallbackInfo ci)
     {

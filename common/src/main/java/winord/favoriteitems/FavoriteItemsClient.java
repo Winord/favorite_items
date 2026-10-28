@@ -23,7 +23,7 @@ import static winord.favoriteitems.FavoriteItems.MOD_ID;
 public final class FavoriteItemsClient {
     public static final KeyMapping FAVORITE_KEY = new KeyMapping(
             "key." + MOD_ID + ".favorite_item",
-            InputConstants.Type.KEYSYM,
+            InputConstants.Type.KEYBOARD,
             InputConstants.KEY_LALT,
             ToggleKeybinds.CATEGORY);
 

@@ -2,9 +2,12 @@ package winord.favoriteitems.util;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.BlockTransformer;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -23,22 +26,19 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
-import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.BrushItem;
 import net.minecraft.world.item.CrossbowItem;
 import net.minecraft.world.item.FishingRodItem;
 import net.minecraft.world.item.FlintAndSteelItem;
 import net.minecraft.world.item.FoodOnAStickItem;
-import net.minecraft.world.item.HoeItem;
-import net.minecraft.world.item.HoneycombItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.BlockTransformers;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.MaceItem;
 import net.minecraft.world.item.ProjectileWeaponItem;
 import net.minecraft.world.item.ShearsItem;
 import net.minecraft.world.item.ShieldItem;
-import net.minecraft.world.item.ShovelItem;
 import net.minecraft.world.item.TridentItem;
 import net.minecraft.world.item.component.BlocksAttacks;
 import net.minecraft.world.level.Level;
@@ -52,7 +52,6 @@ import net.minecraft.world.level.block.CandleCakeBlock;
 import net.minecraft.world.level.block.GrowingPlantHeadBlock;
 import net.minecraft.world.level.block.PumpkinBlock;
 import net.minecraft.world.level.block.TntBlock;
-import net.minecraft.world.level.block.WeatheringCopper;
 import net.minecraft.world.level.block.WeatheringCopperGolemStatueBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -63,10 +62,7 @@ import winord.favoriteitems.config.ProtectAction;
 import winord.favoriteitems.config.ProtectDefaults;
 import winord.favoriteitems.config.ProtectEntryMatcher;
 import winord.favoriteitems.config.ProtectVanilla;
-import winord.favoriteitems.mixin.AxeItemAccessor;
 import winord.favoriteitems.mixin.BrushItemAccessor;
-import winord.favoriteitems.mixin.HoeItemAccessor;
-import winord.favoriteitems.mixin.ShovelItemAccessor;
 
 import static winord.favoriteitems.FavoriteItems.MOD_ID;
 
@@ -221,11 +217,7 @@ public final class ToolGuard {
         var charged = stack.get(DataComponents.CHARGED_PROJECTILES);
         if (charged == null || charged.isEmpty()) return SINGLE_USE_COST;
 
-        int cost = 0;
-        for (var projectile : charged.itemCopies()) {
-            cost += projectile.is(Items.FIREWORK_ROCKET) ? FIREWORK_SHOT_COST : SINGLE_USE_COST;
-        }
-        return cost;
+        return charged.itemCopies().mapToInt(projectile -> projectile.is(Items.FIREWORK_ROCKET) ? FIREWORK_SHOT_COST : SINGLE_USE_COST).sum();
     }
 
     private static int reelInCost(FishingHook hook) {
@@ -246,9 +238,9 @@ public final class ToolGuard {
         var block = state.getBlock();
 
         int cost = 0;
-        if (isAxe(stack) && (axeActsOn(state, block) || block instanceof WeatheringCopperGolemStatueBlock)) cost = SINGLE_USE_COST;
-        if (isShovel(stack) && shovelActsOn(state, block)) cost = SINGLE_USE_COST;
-        if (isHoe(stack) && HoeItemAccessor.favoriteitems$tillables().containsKey(block)) cost = SINGLE_USE_COST;
+        if (isAxe(stack) && (transformerActs(player, stack, hit) || block instanceof WeatheringCopperGolemStatueBlock)) cost = SINGLE_USE_COST;
+        if (isShovel(stack) && shovelActsOn(player, stack, hit, state)) cost = SINGLE_USE_COST;
+        if (isHoe(stack) && transformerActs(player, stack, hit)) cost = SINGLE_USE_COST;
         if (isShears(stack) && shearsActOn(state, block)) cost = SINGLE_USE_COST;
         if (stack.getItem() instanceof BrushItem && block instanceof BrushableBlock) cost = SINGLE_USE_COST;
         if (stack.getItem() instanceof FlintAndSteelItem && flintActsOn(player, hit, state, block)) cost = SINGLE_USE_COST;
@@ -275,15 +267,37 @@ public final class ToolGuard {
     }
 
     private static boolean isAxe(ItemStack stack) {
-        return stack.getItem() instanceof AxeItem || stack.is(ItemTags.AXES);
+        return stack.is(ItemTags.AXES) || usesTransformer(stack, BlockTransformers.AXE);
     }
 
     private static boolean isShovel(ItemStack stack) {
-        return stack.getItem() instanceof ShovelItem || stack.is(ItemTags.SHOVELS);
+        return stack.is(ItemTags.SHOVELS) || usesTransformer(stack, BlockTransformers.SHOVEL);
     }
 
     private static boolean isHoe(ItemStack stack) {
-        return stack.getItem() instanceof HoeItem || stack.is(ItemTags.HOES);
+        return stack.is(ItemTags.HOES) || usesTransformer(stack, BlockTransformers.HOE);
+    }
+
+    private static boolean usesTransformer(ItemStack stack, ResourceKey<BlockTransformer> key) {
+        var transformer = stack.get(DataComponents.BLOCK_TRANSFORMER);
+        return transformer != null && transformer.is(key);
+    }
+
+    private static boolean transformerActs(Player player, ItemStack stack, BlockHitResult hit) {
+        var transformer = stack.get(DataComponents.BLOCK_TRANSFORMER);
+        if (transformer == null) return false;
+        if (stack == player.getMainHandItem() && player.getOffhandItem().has(DataComponents.BLOCKS_ATTACKS)
+                && !player.isSecondaryUseActive()) {
+            return false;
+        }
+
+        var level = player.level();
+        Direction face = hit.getDirection();
+        for (var transform : transformer.value().transforms()) {
+            if (transform.disallowedFaces().contains(face)) continue;
+            if (transform.blockStateProvider().value().getOptionalState(level, level.getRandom(), hit.getBlockPos()) != null) return true;
+        }
+        return false;
     }
 
     private static boolean flintActsOn(Player player, BlockHitResult hit, BlockState state, Block block) {
@@ -343,9 +357,9 @@ public final class ToolGuard {
         BlockState state = player.level().getBlockState(hit.getBlockPos());
         Block block = state.getBlock();
 
-        if (axe && axeActsOn(state, block)) return AXE;
-        if (shovel && shovelActsOn(state, block)) return SHOVEL;
-        if (hoe && HoeItemAccessor.favoriteitems$tillables().containsKey(block)) return HOE;
+        if (axe && transformerActs(player, stack, hit)) return AXE;
+        if (shovel && shovelActsOn(player, stack, hit, state)) return SHOVEL;
+        if (hoe && transformerActs(player, stack, hit)) return HOE;
         if (shears && shearsActOn(state, block)) return SHEARS;
         if (brush && block instanceof BrushableBlock) return BRUSH;
         return null;
@@ -403,15 +417,9 @@ public final class ToolGuard {
                 || stack.is(SHEARS_TAG_FABRIC) || stack.is(SHEARS_TAG_TOOLS);
     }
 
-    private static boolean axeActsOn(BlockState state, Block block) {
-        return AxeItemAccessor.favoriteitems$strippables().containsKey(block)
-                || WeatheringCopper.getPrevious(state).isPresent()
-                || HoneycombItem.WAX_OFF_BY_BLOCK.get().containsKey(block);
-    }
-
-    private static boolean shovelActsOn(BlockState state, Block block) {
-        return ShovelItemAccessor.favoriteitems$flattenables().containsKey(block)
-                || CampfireBlock.isLitCampfire(state);
+    private static boolean shovelActsOn(Player player, ItemStack stack, BlockHitResult hit, BlockState state) {
+        return transformerActs(player, stack, hit)
+                || (stack.is(ItemTags.DOUSES_CAMPFIRES) && CampfireBlock.isLitCampfire(state));
     }
 
     private static boolean shearsActOn(BlockState state, Block block) {
