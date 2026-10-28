@@ -1,6 +1,6 @@
 package winord.favoriteitems.config;
 
-import net.minecraft.util.Util;
+import com.mojang.blaze3d.Blaze3D;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineTextWidget;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
@@ -8,10 +8,12 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 
+import java.net.URI;
+
 import static winord.favoriteitems.FavoriteItems.MOD_ID;
 
 public final class MissingClothScreen extends Screen {
-    private static final String CLOTH_CONFIG_URL = "https://modrinth.com/project/9s6osm5g";
+    private static final URI CLOTH_CONFIG_URL = URI.create("https://modrinth.com/project/9s6osm5g");
 
     private final Screen parent;
 
@@ -31,7 +33,7 @@ public final class MissingClothScreen extends Screen {
 
         addRenderableWidget(Button.builder(Component.translatable("config." + MOD_ID + ".missing_cloth.modrinth"),
                         b -> minecraft.gui.setScreen(new ConfirmLinkScreen(confirmed -> {
-                            if (confirmed) Util.getPlatform().openUri(CLOTH_CONFIG_URL);
+                            if (confirmed) Blaze3D.openUri(CLOTH_CONFIG_URL);
                             minecraft.gui.setScreen(this);
                         }, CLOTH_CONFIG_URL, true)))
                 .pos(width / 2 - 115, height / 2 - 10)
