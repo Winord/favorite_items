@@ -1,5 +1,6 @@
 package winord.favoriteitems.compat.nemosinventorysorting;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import dev.architectury.platform.Platform;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
@@ -8,7 +9,7 @@ public final class NemoCompat {
     public static final String MOD_ID = "nemos_inventory_sorting";
     public static final String LOCKED_SLOTS_FILE = "locked-slots-config.json";
 
-    private static final int ALT_MODIFIER = 4;
+    private static final int ALT_MODIFIER = InputConstants.MOD_ALT;
 
     private static Boolean loaded = null;
 

@@ -260,7 +260,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
     @Inject(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;getHoveredSlot(DD)Lnet/minecraft/world/inventory/Slot;"), cancellable = true)
     private void favoriteitems$toggleOnKeyClick(MouseButtonEvent event, boolean doubleClick, CallbackInfoReturnable<Boolean> cir) {
         double mouseX = event.x(), mouseY = event.y();
-        if (FavoriteSlots.isSuspended() || event.button() != 0) return;
+        if (FavoriteSlots.isSuspended() || event.button() != InputConstants.MOUSE_BUTTON_LEFT) return;
 
         var slot = getHoveredSlot(mouseX, mouseY);
         if (slot == null || !slot.hasItem() || !favoriteitems$isFavoriteKeyDown() || !menu.getCarried().isEmpty()) return;
@@ -279,7 +279,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
         if (favoriteitems$keyDragMode == KEY_DRAG_NONE) return;
 
         double mouseX = event.x(), mouseY = event.y();
-        if (event.button() != 0 || FavoriteSlots.isSuspended() || !menu.getCarried().isEmpty() || !favoriteitems$isFavoriteKeyDown()) {
+        if (event.button() != InputConstants.MOUSE_BUTTON_LEFT || FavoriteSlots.isSuspended() || !menu.getCarried().isEmpty() || !favoriteitems$isFavoriteKeyDown()) {
             favoriteitems$keyDragMode = KEY_DRAG_NONE;
             return;
         }
@@ -297,7 +297,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
 
     @Inject(method = "mouseReleased", at = @At("HEAD"))
     private void favoriteitems$endKeyDrag(MouseButtonEvent event, CallbackInfoReturnable<Boolean> cir) {
-        if (event.button() == 0) favoriteitems$keyDragMode = KEY_DRAG_NONE;
+        if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) favoriteitems$keyDragMode = KEY_DRAG_NONE;
     }
 
     @Unique

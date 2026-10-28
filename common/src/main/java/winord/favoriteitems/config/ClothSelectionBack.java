@@ -1,5 +1,6 @@
 package winord.favoriteitems.config;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import me.shedaniel.clothconfig2.gui.entries.SelectionListEntry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class ClothSelectionBack {
-    private static final int RIGHT_BUTTON = 1;
+    private static final int RIGHT_BUTTON = InputConstants.MOUSE_BUTTON_RIGHT;
 
     private static Field indexField;
     private static Field valuesField;
