@@ -7,7 +7,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public final class CraftTopUp {
     private CraftTopUp() { }
@@ -24,7 +23,8 @@ public final class CraftTopUp {
         var favorites = new ArrayList<Slot>();
         int free = 0;
         for (var slot : menu.slots) {
-            if (!isBackpackSlot(slot) || !FavoriteSlots.isFavorite(FavoriteSlots.playerInventoryIndex(slot))) continue;
+            int index = FavoriteSlots.playerInventoryIndex(slot);
+            if (index < 0 || index >= FavoriteSlots.ARMOR_START_INDEX || !FavoriteSlots.isFavorite(index)) continue;
 
             var held = slot.getItem();
             int space = slot.getMaxStackSize(held) - held.getCount();
@@ -33,14 +33,8 @@ public final class CraftTopUp {
                 free += space;
             }
         }
-        if (free <= 0) return false;
 
-        int craftable = craftableTimes(menu);
-        if (craftable <= 0) return false;
-
-        int crafts = Math.min((free + yield - 1) / yield, craftable);
-        int overshoot = crafts * yield - free;
-        if (overshoot > 0 && overshoot > overflowRoom(menu, product, maxStack)) crafts--;
+        int crafts = Math.min(free / yield, craftableTimes(menu));
         if (crafts <= 0) return false;
 
         for (int remaining = crafts; remaining > 0; ) {
@@ -56,16 +50,17 @@ public final class CraftTopUp {
             }
             if (crafted == 0) break;
 
-            deposit(menu, favorites);
-            if (!menu.getCarried().isEmpty()) deposit(menu, overflowSlots(menu, product));
+            for (var slot : favorites) {
+                if (menu.getCarried().isEmpty()) break;
+
+                var held = slot.getItem();
+                if (held.getCount() < slot.getMaxStackSize(held) && ItemStack.isSameItemSameComponents(held, menu.getCarried())) {
+                    SlotClicks.click(menu, slot.index, 0);
+                }
+            }
             remaining -= crafted;
         }
         return true;
-    }
-
-    private static boolean isBackpackSlot(Slot slot) {
-        int index = FavoriteSlots.playerInventoryIndex(slot);
-        return index >= 0 && index < FavoriteSlots.ARMOR_START_INDEX;
     }
 
     private static int craftableTimes(AbstractContainerMenu menu) {
@@ -78,47 +73,5 @@ public final class CraftTopUp {
             }
         }
         return hasGrid ? times : 0;
-    }
-
-    private static List<Slot> overflowSlots(AbstractContainerMenu menu, ItemStack product) {
-        var partial = new ArrayList<Slot>();
-        var empty = new ArrayList<Slot>();
-        for (int i = menu.slots.size() - 1; i >= 0; i--) {
-            var slot = menu.slots.get(i);
-            if (!isBackpackSlot(slot)) continue;
-
-            int index = FavoriteSlots.playerInventoryIndex(slot);
-            var held = slot.getItem();
-            if (held.isEmpty()) {
-                if (!FavoriteSlots.isMarked(index)) empty.add(slot);
-            } else if (!FavoriteSlots.isFavorite(index) && held.getCount() < slot.getMaxStackSize(held)
-                    && ItemStack.isSameItemSameComponents(held, product)) {
-                partial.add(slot);
-            }
-        }
-        partial.addAll(empty);
-        return partial;
-    }
-
-    private static int overflowRoom(AbstractContainerMenu menu, ItemStack product, int maxStack) {
-        int room = 0;
-        for (var slot : overflowSlots(menu, product)) {
-            room += slot.hasItem() ? slot.getMaxStackSize(slot.getItem()) - slot.getItem().getCount() : maxStack;
-        }
-        return room;
-    }
-
-    private static void deposit(AbstractContainerMenu menu, List<Slot> targets) {
-        for (var slot : targets) {
-            var carried = menu.getCarried();
-            if (carried.isEmpty()) return;
-
-            var held = slot.getItem();
-            if (held.isEmpty() ? FavoriteSlots.isMarked(FavoriteSlots.playerInventoryIndex(slot))
-                    : held.getCount() >= slot.getMaxStackSize(held) || !ItemStack.isSameItemSameComponents(held, carried)) {
-                continue;
-            }
-            SlotClicks.click(menu, slot.index, 0);
-        }
     }
 }
