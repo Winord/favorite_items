@@ -12,6 +12,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.inventory.ResultSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
@@ -28,6 +29,7 @@ import winord.favoriteitems.compat.ipn.IpnCompat;
 import winord.favoriteitems.extension.ExtensionContainerScreen;
 import winord.favoriteitems.sound.FavoriteItemsSounds;
 import winord.favoriteitems.util.ActionBarMessages;
+import winord.favoriteitems.util.CraftTopUp;
 import winord.favoriteitems.util.FavoriteSlots;
 import winord.favoriteitems.util.RenderUtil;
 import winord.favoriteitems.util.SlotClicks;
@@ -480,6 +482,8 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
                     } else {
                         ci.cancel();
                     }
+                } else if (slot instanceof ResultSlot) {
+                    if (CraftTopUp.run(menu, slot)) ci.cancel();
                 } else if (FavoriteSlots.playerInventoryIndex(slot) < 0 && slotStack.getMaxStackSize() > 1
                         && favoriteitems$findToppableFavorite(slotStack) != null) {
                     ci.cancel();

@@ -238,6 +238,10 @@ public final class FavoriteSlots {
         return result;
     }
 
+    public static boolean isMarked(int index) {
+        return index >= 0 && !isSuspended() && favorites.containsKey(index);
+    }
+
     public static boolean isFavorite(int index) {
         if (index < 0 || isSuspended() || !favorites.containsKey(index)) return false;
         if (isEnderChestIndex(index)) return true;

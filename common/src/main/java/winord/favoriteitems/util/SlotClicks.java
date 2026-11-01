@@ -59,7 +59,7 @@ public final class SlotClicks {
         return minecraft.gameMode != null && minecraft.player != null;
     }
 
-    private static void click(AbstractContainerMenu menu, int slot, int button) {
+    static void click(AbstractContainerMenu menu, int slot, int button) {
         var minecraft = Minecraft.getInstance();
         minecraft.gameMode.handleContainerInput(menu.containerId, slot, button, ContainerInput.PICKUP, minecraft.player);
     }
