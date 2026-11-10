@@ -124,6 +124,13 @@ public final class ToolGuard {
         return stack != null && protect(stack, miningCost(stack, player.level(), pos));
     }
 
+    public static boolean wouldBreakMining(ItemStack stack, BlockState state) {
+        if (!breakingProtectEnabled() || !isBreakable(stack) || stack.has(DataComponents.PIERCING_WEAPON)) return false;
+
+        var level = Minecraft.getInstance().level;
+        return level != null && breaks(stack, miningCost(stack, level, BlockPos.ZERO, state));
+    }
+
     public static boolean blocksEntityAttack(Player player, Entity target) {
         var stack = guardedStack(player.getMainHandItem());
         return stack != null && protect(stack, attackCost(stack, target));
@@ -161,8 +168,12 @@ public final class ToolGuard {
         return equippable == null || !isArmorSlot(equippable.slot());
     }
 
+    private static boolean breaks(ItemStack stack, int cost) {
+        return cost > 0 && stack.getMaxDamage() - stack.getDamageValue() <= cost;
+    }
+
     private static boolean protect(ItemStack stack, int cost) {
-        if (cost <= 0 || stack.getMaxDamage() - stack.getDamageValue() > cost) return false;
+        if (!breaks(stack, cost)) return false;
 
         ActionBarMessages.toolBreakBlocked(stack);
         return true;
@@ -184,10 +195,13 @@ public final class ToolGuard {
     }
 
     private static int miningCost(ItemStack stack, Level level, BlockPos pos) {
+        return miningCost(stack, level, pos, level.getBlockState(pos));
+    }
+
+    private static int miningCost(ItemStack stack, Level level, BlockPos pos, BlockState state) {
         var tool = stack.get(DataComponents.TOOL);
         if (tool == null || tool.damagePerBlock() <= 0) return 0;
 
-        var state = level.getBlockState(pos);
         if (state.isAir()) return 0;
 
         boolean costs = stack.getItem() instanceof ShearsItem

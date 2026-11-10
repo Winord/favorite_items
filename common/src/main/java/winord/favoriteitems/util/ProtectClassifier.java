@@ -24,6 +24,10 @@ public final class ProtectClassifier {
         return of(classifyItem(stack, false));
     }
 
+    public static ProtectAction[] forItemOnBlock(ItemStack stack) {
+        return of(classifyItem(stack, true));
+    }
+
     public static ProtectAction[] forBlockUse(Player player, ItemStack stack, BlockHitResult hit) {
         var state = player.level().getBlockState(hit.getBlockPos());
         ProtectPreset preset = ProtectPresets.active();

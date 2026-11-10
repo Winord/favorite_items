@@ -7,6 +7,9 @@
     "defaultRequire": 0
   },
   "mixins": [
+    "MixinBuildprintBlockAdjuster",
+    "MixinBuildprintContainerFiller",
+    "MixinBuildprintDestroyAssist",
     "MixinBuildprintPlaceExecutor"
   ]
 }

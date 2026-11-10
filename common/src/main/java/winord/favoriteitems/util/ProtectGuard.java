@@ -88,6 +88,14 @@ public final class ProtectGuard {
         return isTargeted(inventoryIndex) && isActive(player) && protectsPlacing(stack);
     }
 
+    public static boolean hidesFromAssist(Player player, int inventoryIndex, ItemStack stack) {
+        if (stack.isEmpty() || !isTargeted(inventoryIndex) || !isActive(player) || !inScope(stack)) return false;
+        if (protectsPlacing(stack)) return true;
+
+        var actions = ProtectClassifier.forItemOnBlock(stack);
+        return actions.length > 0 && ProtectPresets.levelOf(actions).covers(stack.getCount());
+    }
+
     public static boolean protectsLastItem(Player player, int inventoryIndex, ItemStack stack) {
         if (stack.isEmpty() || stack.getCount() != 1 || stack.getMaxStackSize() <= 1) return false;
         if (!isTargeted(inventoryIndex) || !isActive(player)) return false;
