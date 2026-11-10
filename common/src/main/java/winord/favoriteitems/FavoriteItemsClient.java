@@ -11,6 +11,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.level.storage.LevelResource;
 import winord.favoriteitems.compat.ipn.IpnCompat;
+import winord.favoriteitems.compat.sorted.SortedCompat;
 import winord.favoriteitems.config.FavoriteItemsConfig;
 import winord.favoriteitems.config.ProtectPresets;
 import winord.favoriteitems.config.StylePreviewOverlay;
@@ -34,6 +35,7 @@ public final class FavoriteItemsClient {
         ProtectPresets.load();
         KeyMappingRegistry.register(FAVORITE_KEY);
         ToggleKeybinds.register();
+        SortedCompat.register();
 
         ClientGuiEvent.INIT_POST.register((screen, access) -> StylePreviewOverlay.onInit(screen));
         ClientScreenInputEvent.MOUSE_CLICKED_PRE.register((client, screen, event, doubleClick) -> {
@@ -63,6 +65,7 @@ public final class FavoriteItemsClient {
         ClientPlayerEvent.CLIENT_PLAYER_QUIT.register(player -> FavoriteSlots.leaveScope());
 
         ClientTickEvent.CLIENT_POST.register(client -> {
+            SortedCompat.tick();
             if (client.player == null) return;
 
             FavoriteSlots.clientTick(client.player.getInventory());

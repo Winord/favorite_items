@@ -51,6 +51,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
     @Unique private static final int KEY_DRAG_NONE = 0;
     @Unique private static final int KEY_DRAG_FAVORITE = 1;
     @Unique private static final int KEY_DRAG_UNFAVORITE = -1;
+    @Unique private static final float KEY_PREVIEW_ALPHA = 0.5f;
 
     @Shadow @Final protected T menu;
     @Shadow @Final protected Set<Slot> quickCraftSlots;
@@ -322,7 +323,10 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
 
     @Inject(method = "extractSlot", at = @At("HEAD"))
     private void favoriteitems$renderIconUnderItem(GuiGraphicsExtractor graphics, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
-        if (!FavoriteSlots.isFavorite(favoriteitems$indexOf(slot))) return;
+        if (!FavoriteSlots.isFavorite(favoriteitems$indexOf(slot))) {
+            if (favoriteitems$showsKeyPreview(slot)) RenderUtil.renderActiveIcon(graphics, false, slot.x, slot.y, KEY_PREVIEW_ALPHA);
+            return;
+        }
 
         var settings = FavoriteItemsConfig.activeSettings();
         if (settings.backgroundEnabled && slot.hasItem()) {
@@ -335,7 +339,18 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
     private void favoriteitems$renderIconAboveItem(GuiGraphicsExtractor graphics, Slot slot, int mouseX, int mouseY, CallbackInfo ci) {
         if (FavoriteSlots.isFavorite(favoriteitems$indexOf(slot))) {
             RenderUtil.renderActiveIcon(graphics, true, slot.x, slot.y, 1f);
+        } else if (favoriteitems$showsKeyPreview(slot)) {
+            RenderUtil.renderActiveIcon(graphics, true, slot.x, slot.y, KEY_PREVIEW_ALPHA);
         }
+    }
+
+    @Unique
+    private boolean favoriteitems$showsKeyPreview(Slot slot) {
+        if (slot != hoveredSlot || !slot.hasItem() || favoriteitems$keyDragMode == KEY_DRAG_UNFAVORITE) return false;
+        if (FavoriteSlots.isSuspended() || !FavoriteItemsConfig.activeSettings().iconEnabled) return false;
+        if (!menu.getCarried().isEmpty() || !favoriteitems$isFavoriteKeyDown()) return false;
+
+        return favoriteitems$indexOf(slot) >= 0;
     }
 
     @Inject(method = "extractCarriedItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;extractFloatingItem(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V"))

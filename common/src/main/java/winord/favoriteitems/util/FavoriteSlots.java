@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 public final class FavoriteSlots {
     public static final int HOTBAR_SIZE = 9;
@@ -59,7 +59,7 @@ public final class FavoriteSlots {
 
     private record PendingReturn(ItemStack[] before, ItemStack stack) { }
 
-    private static final Map<Integer, Item> favorites = new TreeMap<>();
+    private static final Map<Integer, Item> favorites = new ConcurrentSkipListMap<>();
     private static Path currentFile = null;
 
     private static Item[] lastItems = null;

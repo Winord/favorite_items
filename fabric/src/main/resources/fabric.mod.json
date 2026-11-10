@@ -40,6 +40,7 @@
         "inventorysorter": "*",
         "clientsort": "*",
         "nemos_inventory_sorting": "*",
+        "sorted": "*",
         "inventoryprofilesnext": "*",
         "litematica": "*",
         "buildprint": "*"

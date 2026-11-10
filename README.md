@@ -46,6 +46,9 @@ Favorited slots are left alone by these sorting mods (each integration only acti
 - Inventory Profiles Next: sorting, move-all, scrolling and slot locks leave favorites alone, and auto refill can skip
   them or top up a favorited stack whose last item is protected.
 - Litematica: Easy Place and Pick Block skip a favorited stack that Additional Protection guards.
+- Sorted 0.1.42 or newer: its sorts, Quick Stack, Quick Empty, Pull All and Quick Fill leave favorited slots alone (a favorite
+  can still be topped up), and its own `Alt` gestures step aside while the favorite key is `Alt`. Hold the favorite key
+  over an item to preview the favorite icon on it.
 
 By default favorites also stay put when the *Move Same Items* buttons and keys (Nemo's Inventory Sorting, ClientSort,
 Inventory Profiles Next) run. The Extra tab can change that so that stackable favorites move too, one item staying in
