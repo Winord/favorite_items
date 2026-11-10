@@ -31,6 +31,7 @@ import winord.favoriteitems.sound.FavoriteItemsSounds;
 import winord.favoriteitems.util.ActionBarMessages;
 import winord.favoriteitems.util.CraftTopUp;
 import winord.favoriteitems.util.FavoriteSlots;
+import winord.favoriteitems.util.ItemClickOverrides;
 import winord.favoriteitems.util.RenderUtil;
 import winord.favoriteitems.util.SlotClicks;
 
@@ -425,14 +426,23 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
         var slotIsFavorite = FavoriteSlots.isFavorite(index);
 
         var slotStack = slot.getItem();
-        var depositCount = button != 0 ? 1 : cursorStack.getCount();
+        var depositCount = cursorStack.isEmpty() ? 0 : Math.min(button != 0 ? 1 : cursorStack.getCount(), slot.getMaxStackSize(cursorStack));
         var sameItem = ItemStack.isSameItemSameComponents(cursorStack, slotStack);
         var canFullyMerge = sameItem
-                && slotStack.getMaxStackSize() >= slotStack.getCount() + depositCount
+                && slot.getMaxStackSize(cursorStack) >= slotStack.getCount() + depositCount
                 && cursorStack.getCount() == depositCount;
 
         switch (clickType) {
             case PICKUP -> {
+                var itemOverride = ItemClickOverrides.classifyPickup(cursorStack, slotStack, button);
+                if (itemOverride != ItemClickOverrides.Kind.NONE) {
+                    if (itemOverride == ItemClickOverrides.Kind.CURSOR_ABSORBS_SLOT_ITEM && slotIsFavorite
+                            || itemOverride == ItemClickOverrides.Kind.SLOT_ABSORBS_CURSOR_ITEM && cursorIsFavorite) {
+                        ci.cancel();
+                    }
+                    return;
+                }
+
                 if (!slotIsFavoritable) {
                     if (cursorIsFavorite) ci.cancel();
                 } else if (!cursorStack.isEmpty() && !slot.mayPlace(cursorStack)) {
@@ -463,6 +473,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
                         }
                     }
                 } else if (!cursorStack.isEmpty() && !slotStack.isEmpty()) {
+                    if (cursorStack.getCount() > slot.getMaxStackSize(cursorStack)) return;
                     if (cursorIsFavorite) FavoriteSlots.favorite(index); else FavoriteSlots.unfavorite(index);
                     favoriteitems$cursorFavorite = slotIsFavorite;
                 }
@@ -493,8 +504,14 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
             case SWAP -> {
                 var hotbarIndex = button;
                 var hotbarIsFavorite = FavoriteSlots.isFavorite(hotbarIndex);
+                var hotbarStackSwap = minecraft.player.getInventory().getItem(hotbarIndex);
 
                 if (hotbarIsFavorite && !slotIsFavoritable) {
+                    ci.cancel();
+                } else if (slotIsFavoritable && (hotbarIsFavorite || slotIsFavorite && !slotStack.isEmpty())
+                        && !hotbarStackSwap.isEmpty() && slot.mayPlace(hotbarStackSwap)
+                        && hotbarStackSwap.getCount() > slot.getMaxStackSize(hotbarStackSwap)
+                        && (slotStack.isEmpty() || slot.mayPickup(minecraft.player))) {
                     ci.cancel();
                 } else if (slotIsFavoritable && hotbarIsFavorite != slotIsFavorite) {
                     if (!slotStack.isEmpty() && !slot.mayPickup(minecraft.player)) return;
@@ -580,10 +597,10 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
         var targetStack = slot.getItem();
         var depositCount = AbstractContainerMenu.getQuickcraftType(button) == 1 ? 1 : cursorStack.getCount();
 
-        if (targetStack.isEmpty()) return depositCount == cursorStack.getCount();
-        if (!ItemStack.isSameItemSameComponents(cursorStack, targetStack)) return true;
+        if (targetStack.isEmpty()) return depositCount == cursorStack.getCount() && depositCount <= slot.getMaxStackSize(cursorStack);
+        if (!ItemStack.isSameItemSameComponents(cursorStack, targetStack)) return cursorStack.getCount() <= slot.getMaxStackSize(cursorStack);
 
-        return targetStack.getMaxStackSize() >= targetStack.getCount() + depositCount
+        return slot.getMaxStackSize(cursorStack) >= targetStack.getCount() + depositCount
                 && cursorStack.getCount() == depositCount;
     }
 

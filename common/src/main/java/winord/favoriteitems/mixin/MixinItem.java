@@ -23,6 +23,8 @@ public abstract class MixinItem {
     private boolean favoriteitems$armorWasFavorite;
     @Unique
     private int favoriteitems$armorIndex = -1;
+    @Unique
+    private int favoriteitems$handCount;
 
     @Inject(method = "use", at = @At("HEAD"))
     private void favoriteitems$rememberFavorites(
@@ -39,6 +41,7 @@ public abstract class MixinItem {
         favoriteitems$armorIndex = FavoriteSlots.ARMOR_START_INDEX + equippable.slot().getIndex();
         favoriteitems$handWasFavorite = FavoriteSlots.isFavorite(favoriteitems$handIndex(user, hand));
         favoriteitems$armorWasFavorite = FavoriteSlots.isFavorite(favoriteitems$armorIndex);
+        favoriteitems$handCount = user.getItemInHand(hand).getCount();
     }
 
     @Inject(method = "use", at = @At("RETURN"))
@@ -51,6 +54,7 @@ public abstract class MixinItem {
         if (armorIndex < 0) return;
         if (!favoriteitems$isLocalUse(level, user)) return;
         if (!cir.getReturnValue().consumesAction()) return;
+        if (favoriteitems$handCount > 1) return;
         if (favoriteitems$handWasFavorite == favoriteitems$armorWasFavorite) return;
 
         int handIndex = favoriteitems$handIndex(user, hand);
