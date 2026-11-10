@@ -24,7 +24,8 @@
         "favoriteitems.mixins.clientsort.json",
         "favoriteitems.mixins.nemosinventorysorting.json",
         "favoriteitems.mixins.ipn.json",
-        "favoriteitems.mixins.litematica.json"
+        "favoriteitems.mixins.litematica.json",
+        "favoriteitems.mixins.buildprint.json"
     ],
     "depends": {
         "fabricloader": ">=0.19.5",
@@ -40,6 +41,7 @@
         "clientsort": "*",
         "nemos_inventory_sorting": "*",
         "inventoryprofilesnext": "*",
-        "litematica": "*"
+        "litematica": "*",
+        "buildprint": "*"
     }
 }
