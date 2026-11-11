@@ -362,6 +362,10 @@ public final class FavoriteSlots {
         save();
     }
 
+    static Item[] previousItems() {
+        return inventoryReplaced || awaitingContentTicks > 0 ? null : lastItems;
+    }
+
     public static void onInventoryContent() {
         awaitingContentTicks = 0;
         inventoryReplaced = true;

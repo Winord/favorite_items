@@ -50,6 +50,7 @@ public final class ThrownFavorites {
     private static final Set<UUID> knownTridents = new HashSet<>();
     private static final List<Token> tokens = new ArrayList<>();
     private static final List<Arrival> arrivals = new ArrayList<>();
+    private static final Set<Integer> claimed = new HashSet<>();
     private static int usedSlot = -1;
     private static int now = 0;
 
@@ -66,6 +67,7 @@ public final class ThrownFavorites {
         knownTridents.clear();
         tokens.clear();
         arrivals.clear();
+        claimed.clear();
         usedSlot = -1;
     }
 
@@ -99,7 +101,34 @@ public final class ThrownFavorites {
         if (level.getEntity(itemId) instanceof ThrownTrident trident) {
             var id = trident.getUUID();
             tokens.add(new Token(id, flights.contains(id), now));
+            resolveNow();
         }
+    }
+
+    public static void resolveNow() {
+        if (tokens.isEmpty() || FavoriteSlots.isSuspended()) return;
+
+        var player = Minecraft.getInstance().player;
+        var previous = FavoriteSlots.previousItems();
+        if (player == null || previous == null) return;
+
+        var inventory = player.getInventory();
+        var current = new Item[FavoriteSlots.INVENTORY_SIZE];
+        for (int i = 0; i < current.length; i++) current[i] = inventory.getItem(i).getItem();
+
+        for (int i = 0; i < FavoriteSlots.ARMOR_START_INDEX; i++) {
+            if (previous[i] == Items.AIR && tracked(current[i])) addArrival(i);
+        }
+        pairPickups(current);
+    }
+
+    private static void addArrival(int slot) {
+        if (claimed.contains(slot)) return;
+
+        for (var arrival : arrivals) {
+            if (arrival.slot() == slot) return;
+        }
+        arrivals.add(new Arrival(slot, now));
     }
 
     static void tick(Inventory inventory, Item[] previous, Item[] current, boolean replaced) {
@@ -110,6 +139,7 @@ public final class ThrownFavorites {
         pairThrows();
         pairPickups(current);
         expire();
+        claimed.clear();
     }
 
     private static boolean tracked(Item item) {
@@ -166,7 +196,7 @@ public final class ThrownFavorites {
             if (tracked(previous[i]) && current[i] == Items.AIR) {
                 onDeparted(i);
             } else if (i < FavoriteSlots.ARMOR_START_INDEX && previous[i] == Items.AIR && tracked(current[i])) {
-                arrivals.add(new Arrival(i, now));
+                addArrival(i);
             }
         }
     }
@@ -229,6 +259,7 @@ public final class ThrownFavorites {
 
             tokens.remove(token);
             arrivals.remove(arrival);
+            claimed.add(arrival.slot());
             if (token.favorite()) {
                 flights.remove(token.id());
                 FavoriteSlots.setFavorite(arrival.slot(), true);

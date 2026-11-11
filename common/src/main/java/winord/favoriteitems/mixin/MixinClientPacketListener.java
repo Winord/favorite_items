@@ -3,8 +3,10 @@ package winord.favoriteitems.mixin;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.protocol.game.ClientboundContainerSetContentPacket;
+import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerCombatKillPacket;
 import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
+import net.minecraft.network.protocol.game.ClientboundSetPlayerInventoryPacket;
 import net.minecraft.network.protocol.game.ClientboundTakeItemEntityPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -29,6 +31,16 @@ public abstract class MixinClientPacketListener {
     @Inject(method = "handleRespawn", at = @At("TAIL"))
     private void favoriteitems$noteRespawn(ClientboundRespawnPacket packet, CallbackInfo ci) {
         FavoriteSlots.onRespawned();
+    }
+
+    @Inject(method = "handleContainerSetSlot", at = @At("TAIL"))
+    private void favoriteitems$noteSlotChanged(ClientboundContainerSetSlotPacket packet, CallbackInfo ci) {
+        ThrownFavorites.resolveNow();
+    }
+
+    @Inject(method = "handleSetPlayerInventory", at = @At("TAIL"))
+    private void favoriteitems$notePlayerInventorySlot(ClientboundSetPlayerInventoryPacket packet, CallbackInfo ci) {
+        ThrownFavorites.resolveNow();
     }
 
     @Inject(method = "handleTakeItemEntity", at = @At("HEAD"))
