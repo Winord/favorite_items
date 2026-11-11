@@ -24,6 +24,9 @@ config = "favoriteitems.mixins.clientsort.json"
 config = "favoriteitems.mixins.nemosinventorysorting.json"
 
 [[mixins]]
+config = "favoriteitems.mixins.sorted.json"
+
+[[mixins]]
 config = "favoriteitems.mixins.ipn.json"
 
 [[mixins]]

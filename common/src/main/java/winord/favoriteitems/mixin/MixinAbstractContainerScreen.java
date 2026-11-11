@@ -68,6 +68,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
     @Unique private boolean favoriteitems$dragBlocked = false;
 
     @Unique private int favoriteitems$keyDragMode = KEY_DRAG_NONE;
+    @Unique private Slot favoriteitems$keyDragOrigin;
     @Unique private double favoriteitems$keyDragX;
     @Unique private double favoriteitems$keyDragY;
 
@@ -273,6 +274,7 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
         if (index < 0) return;
 
         favoriteitems$keyDragMode = favoriteitems$toggleFavorite(index) ? KEY_DRAG_FAVORITE : KEY_DRAG_UNFAVORITE;
+        favoriteitems$keyDragOrigin = slot;
         favoriteitems$keyDragX = mouseX;
         favoriteitems$keyDragY = mouseY;
         cir.setReturnValue(true);
@@ -346,7 +348,8 @@ public class MixinAbstractContainerScreen<T extends AbstractContainerMenu> exten
 
     @Unique
     private boolean favoriteitems$showsKeyPreview(Slot slot) {
-        if (slot != hoveredSlot || !slot.hasItem() || favoriteitems$keyDragMode == KEY_DRAG_UNFAVORITE) return false;
+        if (slot != hoveredSlot || !slot.hasItem() || !FavoriteItemsConfig.favoriteKeyPreview) return false;
+        if (favoriteitems$keyDragMode == KEY_DRAG_UNFAVORITE && slot != favoriteitems$keyDragOrigin) return false;
         if (FavoriteSlots.isSuspended() || !FavoriteItemsConfig.activeSettings().iconEnabled) return false;
         if (!menu.getCarried().isEmpty() || !favoriteitems$isFavoriteKeyDown()) return false;
 

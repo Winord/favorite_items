@@ -23,6 +23,7 @@ public final class SortedCompat {
     private static Method releaseAlt;
     private static boolean inputFailed;
     private static boolean yielding;
+    private static volatile boolean restoring;
 
     private SortedCompat() { }
 
@@ -46,7 +47,12 @@ public final class SortedCompat {
         }
     }
 
+    public static void setRestoring(boolean value) {
+        restoring = value;
+    }
+
     public static void tick() {
+        restoring = false;
         if (inputFailed || !isLoaded()) return;
 
         boolean wantsAlt = isFavoriteKeyAlt();
@@ -74,7 +80,7 @@ public final class SortedCompat {
     }
 
     private static String inventoryLevel(int slot) {
-        return slot >= 0 && slot < FavoriteSlots.INVENTORY_SIZE && FavoriteSlots.isFavorite(slot) ? TOP_UP : null;
+        return !restoring && slot >= 0 && slot < FavoriteSlots.INVENTORY_SIZE && FavoriteSlots.isFavorite(slot) ? TOP_UP : null;
     }
 
     private static String enderChestLevel(int slot) {

@@ -32,6 +32,8 @@
   "config.favoriteitems.drop_favorites.allow_everything": "Дозволити Все",
   "config.favoriteitems.action_bar_notifications": "Сповіщення в Action Bar",
   "config.favoriteitems.action_bar_notifications.tooltip": "Показує коротке повідомлення над хотбаром,\nколи дію з улюбленим предметом або\nзахищеним інструментом заблоковано,\nа також коли клавіша-перемикач\nвмикає чи вимикає захист.",
+  "config.favoriteitems.key_preview": "Превʼю Клавіші Улюбленого",
+  "config.favoriteitems.key_preview.tooltip": "Коли клавішу улюбленого затиснуто над предметом,\nна ньому показується напівпрозора іконка улюбленого\nяк підказка, що зробить клік.\nВимкнено: іконка з'являється лише після кліку.",
   "config.favoriteitems.protect_enabled": "Додатковий Захист",
   "config.favoriteitems.protect_enabled.tooltip": "Додатковий захист:\nзабороняє використання захищеного предмета у світі\n(улюбленого або будь-якого, див. «Захист Діє На»).\nДетальні налаштування: нижче.\nПрацює незалежно від налаштування\n«Викидання Улюбленого».",
   "config.favoriteitems.protect_scope": "Захищені Предмети",

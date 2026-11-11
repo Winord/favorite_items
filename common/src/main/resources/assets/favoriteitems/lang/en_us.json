@@ -32,6 +32,8 @@
   "config.favoriteitems.drop_favorites.allow_everything": "Allow Everything",
   "config.favoriteitems.action_bar_notifications": "Action Bar Notifications",
   "config.favoriteitems.action_bar_notifications.tooltip": "Shows a short message above the hotbar\nwhen a favorite item or a protected tool\nis blocked, and when a toggle key\nswitches a protection on or off.",
+  "config.favoriteitems.key_preview": "Favorite Key Preview",
+  "config.favoriteitems.key_preview.tooltip": "Holding the favorite key over an item shows\na half-transparent favorite icon on it, as a\npreview of what a click will do.\nOff: the icon appears only after the click.",
   "config.favoriteitems.protect_enabled": "Additional Protection",
   "config.favoriteitems.protect_enabled.tooltip": "Blocks using a protected item in the world\n(favorited or any, see \"Protection Applies To\").\nDetailed settings: below.\nWorks independently of the\n\"Drop Favorites\" setting.",
   "config.favoriteitems.protect_scope": "Protected Items",

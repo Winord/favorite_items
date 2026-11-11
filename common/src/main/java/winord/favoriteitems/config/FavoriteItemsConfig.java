@@ -23,6 +23,7 @@ public final class FavoriteItemsConfig {
     public static HotbarIndicatorMode hotbarIndicatorMode = HotbarIndicatorMode.ON_INTERACTION;
     public static DropFavoriteMode dropFavorites = DropFavoriteMode.BLOCK;
     public static boolean actionBarNotifications = true;
+    public static boolean favoriteKeyPreview = true;
 
     public static boolean protectEnabled = false;
     public static ProtectScope protectScope = ProtectScope.STACKABLE;
@@ -88,6 +89,7 @@ public final class FavoriteItemsConfig {
         DropFavoriteMode dropFavorites = FavoriteItemsConfig.dropFavorites;
         MoveSameFavoritesMode moveSameFavorites = FavoriteItemsConfig.moveSameFavorites;
         boolean actionBarNotifications = FavoriteItemsConfig.actionBarNotifications;
+        boolean favoriteKeyPreview = FavoriteItemsConfig.favoriteKeyPreview;
         boolean protectEnabled = FavoriteItemsConfig.protectEnabled;
         ProtectScope protectScope = FavoriteItemsConfig.protectScope;
         ProtectTarget protectTarget = FavoriteItemsConfig.protectTarget;
@@ -117,6 +119,7 @@ public final class FavoriteItemsConfig {
             if (dropFavorites != null) FavoriteItemsConfig.dropFavorites = dropFavorites;
             if (moveSameFavorites != null) FavoriteItemsConfig.moveSameFavorites = moveSameFavorites;
             FavoriteItemsConfig.actionBarNotifications = actionBarNotifications;
+            FavoriteItemsConfig.favoriteKeyPreview = favoriteKeyPreview;
             FavoriteItemsConfig.protectEnabled = protectEnabled;
             if (protectScope != null) FavoriteItemsConfig.protectScope = protectScope;
             if (protectTarget != null) FavoriteItemsConfig.protectTarget = protectTarget;

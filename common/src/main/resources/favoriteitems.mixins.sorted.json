@@ -1,0 +1,12 @@
+{
+  "required": false,
+  "minVersion": "0.8",
+  "package": "winord.favoriteitems.compat.sorted.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "injectors": {
+    "defaultRequire": 0
+  },
+  "mixins": [
+    "MixinSortedDeathRestore"
+  ]
+}

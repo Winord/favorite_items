@@ -100,6 +100,13 @@ public final class ClothConfigScreenBuilder {
                 .setSaveConsumer(value -> FavoriteItemsConfig.actionBarNotifications = value)
                 .build());
 
+        general.addEntry(entryBuilder
+                .startBooleanToggle(Component.translatable(key("key_preview")), FavoriteItemsConfig.favoriteKeyPreview)
+                .setDefaultValue(true)
+                .setTooltip(Component.translatable(key("key_preview.tooltip")))
+                .setSaveConsumer(value -> FavoriteItemsConfig.favoriteKeyPreview = value)
+                .build());
+
         var styles = builder.getOrCreateCategory(Component.translatable(key("category.styles")));
         for (var style : FavoriteStyle.values()) {
             styles.addEntry(style == FavoriteStyle.MINIMAL

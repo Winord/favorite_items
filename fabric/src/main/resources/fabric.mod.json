@@ -23,6 +23,7 @@
         "favoriteitems.mixins.inventorysorter.json",
         "favoriteitems.mixins.clientsort.json",
         "favoriteitems.mixins.nemosinventorysorting.json",
+        "favoriteitems.mixins.sorted.json",
         "favoriteitems.mixins.ipn.json",
         "favoriteitems.mixins.litematica.json",
         "favoriteitems.mixins.buildprint.json"
