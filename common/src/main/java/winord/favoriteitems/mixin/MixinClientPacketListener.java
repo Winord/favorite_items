@@ -5,11 +5,13 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.protocol.game.ClientboundContainerSetContentPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerCombatKillPacket;
 import net.minecraft.network.protocol.game.ClientboundRespawnPacket;
+import net.minecraft.network.protocol.game.ClientboundTakeItemEntityPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import winord.favoriteitems.util.FavoriteSlots;
+import winord.favoriteitems.util.ThrownFavorites;
 
 @Mixin(ClientPacketListener.class)
 public abstract class MixinClientPacketListener {
@@ -27,5 +29,10 @@ public abstract class MixinClientPacketListener {
     @Inject(method = "handleRespawn", at = @At("TAIL"))
     private void favoriteitems$noteRespawn(ClientboundRespawnPacket packet, CallbackInfo ci) {
         FavoriteSlots.onRespawned();
+    }
+
+    @Inject(method = "handleTakeItemEntity", at = @At("HEAD"))
+    private void favoriteitems$noteItemTaken(ClientboundTakeItemEntityPacket packet, CallbackInfo ci) {
+        ThrownFavorites.onItemTaken(packet.getItemId(), packet.getPlayerId());
     }
 }

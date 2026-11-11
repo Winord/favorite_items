@@ -42,6 +42,7 @@ public final class FavoriteSlots {
     public static final int ENDER_CHEST_OFFSET = 1000;
 
     private static final String LAST_DEATH_KEY = "last_death";
+    private static final String THROWN_KEY = "thrown_favorites";
     private static final int MAX_FILE_NAME_BYTES = 100;
     private static final int CONTENT_WAIT_TICKS = 40;
     private static final int MASS_CHANGE_SLOTS = 5;
@@ -137,6 +138,7 @@ public final class FavoriteSlots {
         inventoryReplaced = false;
         awaitingContentTicks = 0;
         DeathFavorites.reset();
+        ThrownFavorites.reset();
         handSwap.clear();
         handSwapChangesFavorites = false;
         leftCreative = false;
@@ -151,6 +153,8 @@ public final class FavoriteSlots {
             for (var entry : root.entrySet()) {
                 if (entry.getKey().equals(LAST_DEATH_KEY)) {
                     DeathFavorites.load(entry.getValue().getAsJsonObject());
+                } else if (entry.getKey().equals(THROWN_KEY)) {
+                    ThrownFavorites.load(entry.getValue().getAsJsonArray());
                 } else {
                     favorites.put(Integer.parseInt(entry.getKey()), itemOf(entry.getValue().getAsString()));
                 }
@@ -159,6 +163,7 @@ public final class FavoriteSlots {
             FavoriteItems.LOGGER.warn("Failed to load favorite slots from {}, starting with an empty set.", file, e);
             favorites.clear();
             DeathFavorites.reset();
+            ThrownFavorites.reset();
         }
     }
 
@@ -170,6 +175,8 @@ public final class FavoriteSlots {
                 data.addProperty(index.toString(), item == UNLEARNED ? "" : BuiltInRegistries.ITEM.getKey(item).toString()));
         var lastDeath = DeathFavorites.toJson();
         if (lastDeath != null) data.add(LAST_DEATH_KEY, lastDeath);
+        var thrown = ThrownFavorites.toJson();
+        if (thrown != null) data.add(THROWN_KEY, thrown);
 
         try {
             JsonFiles.writeAtomically(GSON, currentFile, data);
@@ -504,7 +511,7 @@ public final class FavoriteSlots {
         save();
     }
 
-    private static boolean setFavorite(int index, boolean favorite) {
+    static boolean setFavorite(int index, boolean favorite) {
         return favorite ? favorites.put(index, UNLEARNED) != UNLEARNED : favorites.remove(index) != null;
     }
 
@@ -523,6 +530,8 @@ public final class FavoriteSlots {
         lastItems = current;
         inventoryReplaced = false;
         leftCreative = false;
+
+        ThrownFavorites.tick(inventory, previous, current, replaced);
 
         boolean dirty = false;
         for (var index : new ArrayList<>(favorites.keySet())) {
